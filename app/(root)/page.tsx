@@ -1,13 +1,11 @@
-import { ModeToggle } from "@/components/ui/theme-button";
+import { UserButton } from "@clerk/nextjs"
 
-
-
-export default function Home() {
-  return (
-  <p>
-   hello from Admin Dashboard 
-  </p>
-   
-
-  );
+const SetupPage = () => {
+  return(
+    <div className="p-4 text-green-400">
+       This is protected
+    </div>
+  )
 }
+
+export default  SetupPage
