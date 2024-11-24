@@ -1,14 +1,14 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
-import { ThemeProvider } from "@/components/theme-provider";
-import {
-  ClerkProvider,
-  SignInButton,
-  SignedIn,
-  SignedOut,
-  UserButton
-} from '@clerk/nextjs'
+import { Nunito } from "next/font/google";
+import Navbar from "./components/Navbar/navbar";
+import Modal from "./components/Modals/Modal";
+import RegisterModal from "./components/Modals/RegisterModal";
+import ToasterProvider from "./Providers/ToastProvider";
+import LoginModal from "./components/Modals/LoginModel";
+import getCurrentUser from "./actions/getCurrentUser";
+import { SessionProvider } from 'next-auth/react';
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -22,31 +22,34 @@ const geistMono = localFont({
 });
 
 export const metadata: Metadata = {
-  title: "e-commerce",
-  description: "A website which sells multiple products",
+  title: "login",
+  description: "login and authentication",
 };
 
-export default function RootLayout({
+const nunito = Nunito({
+  subsets: ["latin"],
+  variable: "--font-nunito", // Add variable for the Nunito font
+});
+
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const currentUser = await getCurrentUser();
   return (
-
-    <ClerkProvider>
     <html lang="en">
-      <body>
-        <SignedOut>
-          <SignInButton />
-        </SignedOut>
-        <SignedIn>
-          <UserButton />
-        </SignedIn>
+      <body
+        className={`${geistSans.variable} ${geistMono.variable} ${nunito.className} antialiased`} 
+      >
+        
+        <ToasterProvider/>
+        <LoginModal/>
+       <RegisterModal/>
+        <Navbar currentUser={currentUser}/>
+       
         {children}
       </body>
     </html>
-  </ClerkProvider>
-    
-    
   );
 }
