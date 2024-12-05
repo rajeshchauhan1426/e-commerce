@@ -1,7 +1,11 @@
 import Image from "next/image";
+import SetupPage from "./(root)/page";
+
 
 export default function Home() {
   return (
-    <div>hello how are u from </div>
+    <div> 
+      <SetupPage/>
+    </div>
   );
 }
