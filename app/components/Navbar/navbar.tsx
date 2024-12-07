@@ -1,12 +1,11 @@
 "use client"
 
-import Container from '../Container'
 import Usermenu from './Usermenu'
-
-
 
 import React from 'react'
 import { SafeUser } from '@/app/types'
+
+import { MainNav } from './main-nav'
 
 interface NavbarProps{
   currentUser? : SafeUser | null;
@@ -17,17 +16,18 @@ const Navbar: React.FC<NavbarProps> =({
   console.log({currentUser})
 
   return (
-    <div className=''>
-        <div className=''>
+    <div className='border-b'>
+        <div className=' items-center border-b-[3px]'>
 
-            <Container>
-                <div className='flex flex-row items-start justify-between gap-3 md:gap-3'>
-                   
-                    
+                <div className='flex flex-row items-center justify-end gap-3 md:gap-3'>
+               
                     <Usermenu currentUser={currentUser}/>
                 </div>
-                </Container>
+                
+               This will be a Store Switcher
+                <MainNav/>
             </div> 
+         
             
             </div>
   )

@@ -11,6 +11,7 @@ import getCurrentUser from "./actions/getCurrentUser";
 import { SessionProvider } from 'next-auth/react';
 import { ModalProvider } from "./Providers/modal-provider";
 
+
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
   variable: "--font-geist-sans",
@@ -38,6 +39,7 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
   const currentUser = await getCurrentUser();
+  
   return (
     <html lang="en">
       <body
@@ -47,7 +49,7 @@ export default async function RootLayout({
         <ToasterProvider/>
         <LoginModal/>
        <RegisterModal/>
-        <Navbar currentUser={currentUser}/>
+       <Navbar currentUser={currentUser}/>
         <ModalProvider/>
        
         {children}

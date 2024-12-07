@@ -24,6 +24,7 @@ export const Modal: React.FC<ModalProps> = ({
   setIsOpen,
   children,
 }) => {
+  // Function to handle modal state change
   const handleOpenChange = (open: boolean) => {
     setIsOpen(open); // Toggle modal state
   };
@@ -36,7 +37,7 @@ export const Modal: React.FC<ModalProps> = ({
           <DialogDescription>{description}</DialogDescription>
         </DialogHeader>
         <div>{children}</div>
-       
+        
       </DialogContent>
     </Dialog>
   );

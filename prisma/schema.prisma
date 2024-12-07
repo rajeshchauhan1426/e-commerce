@@ -19,7 +19,8 @@ model User {
   accounts          Account[]
   sessions          Session[]
   passwordResetToken String?       // For password recovery
-  tokenExpiry       DateTime?      // Expiry for the password reset token
+  tokenExpiry       DateTime?  
+  stores            Store[]        // One-to-many relation with Store
 }
 
 model Account {
@@ -55,4 +56,13 @@ model VerificationToken {
   identifier String        // Email or another identifier
   token      String        @unique
   expires    DateTime
+}
+
+model Store {
+  id          String    @id @default(uuid())
+  name        String
+  userId      String
+  user        User      @relation(fields: [userId], references: [id]) // One-to-many relation with User
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
 }
