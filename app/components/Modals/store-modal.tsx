@@ -52,7 +52,7 @@ export const StoreModal = () => {
 
   return (
     <>
-      <Button onClick={() => setIsOpen(true)}>Create Store</Button>
+    
       <Modal
         title="Create Store"
         description="Add a new Store to manage products and categories"

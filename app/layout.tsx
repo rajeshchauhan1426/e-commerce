@@ -49,7 +49,7 @@ export default async function RootLayout({
         <ToasterProvider/>
         <LoginModal/>
        <RegisterModal/>
-       <Navbar currentUser={currentUser}/>
+        <Navbar currentUser={currentUser}/>
         <ModalProvider/>
        
         {children}
