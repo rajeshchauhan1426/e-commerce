@@ -24,8 +24,8 @@ const geistMono = localFont({
 });
 
 export const metadata: Metadata = {
-  title: "login",
-  description: "login and authentication",
+  title: "e-commerce",
+  description: "Product selling website",
 };
 
 const nunito = Nunito({

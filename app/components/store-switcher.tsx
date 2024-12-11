@@ -57,6 +57,7 @@ const StoreSwitcher: React.FC<StoreSwitcherProps> = () => {
     const fetchStores = async () => {
       try {
         const response = await axios.get("/api/stores"); // Make sure this aligns with your route.ts API endpoint
+        router.refresh()
         const userStores: Store[] = response.data;
 
         setStores(userStores);
@@ -69,7 +70,7 @@ const StoreSwitcher: React.FC<StoreSwitcherProps> = () => {
           }
         }
       } catch (error) {
-        toast.error("Failed to fetch stores");
+        
       }
     };
 
@@ -85,7 +86,11 @@ const StoreSwitcher: React.FC<StoreSwitcherProps> = () => {
   const handleFormSubmit = async (values: z.infer<typeof formSchema>) => {
     try {
       setLoading(true);
-      const response = await axios.post("/api/stores", values); // Ensure this hits the correct route logic in your `route.ts`
+
+      // Check the values being sent to ensure `name` exists.
+      console.log("Form Values:", values);
+
+      const response = await axios.post("/api/stores", values);
       const newStore: Store = response.data;
 
       toast.success("Store created successfully");
@@ -97,6 +102,9 @@ const StoreSwitcher: React.FC<StoreSwitcherProps> = () => {
       router.push(`/${newStore.id}`);
       setIsModalOpen(false);
     } catch (error) {
+      // Log the error message for debugging
+      console.error("Error creating store:", error);
+
       toast.error("Failed to create the store. Please try again.");
     } finally {
       setLoading(false);
