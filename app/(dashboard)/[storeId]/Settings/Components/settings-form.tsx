@@ -21,6 +21,8 @@ import { Input } from "@/app/components/ui/input";
 import axios from "axios";
 import { toast } from "react-hot-toast";
 import { useRouter } from "next/navigation";
+import { ApiAlert } from "@/app/components/ui/ api-alert";
+import { useOrigin } from "@/app/components/hooks/use-origin";
 
 interface SettingsFormProps {
   initialData: Store;
@@ -36,7 +38,7 @@ export const SettingsForm: React.FC<SettingsFormProps> = ({ initialData }) => {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(false); // For delete confirmation
-
+   const origin = useOrigin();
   const form = useForm<SettingFormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: initialData,
@@ -139,6 +141,10 @@ export const SettingsForm: React.FC<SettingsFormProps> = ({ initialData }) => {
           </Button>
         </form>
       </Form>
+      <Separator/>
+      <ApiAlert title="NEXT_PUBLIC_API_URL" 
+      description={`${origin}/api/${initialData.id}`} 
+      variant={"public"}/>
     </>
   );
 };

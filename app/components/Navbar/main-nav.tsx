@@ -15,6 +15,11 @@ export function MainNav({
   // Define the routes array with the correct path structure
   const routes = [
     {
+      href: `/${storeId}/`, // Adjusted to match dynamic structure
+      label: "Overview",
+      active: pathname === `/${storeId}/`,
+    },
+    {
       href: `/${storeId}/Settings`, // Adjusted to match dynamic structure
       label: "Settings",
       active: pathname === `/${storeId}/Settings`,
