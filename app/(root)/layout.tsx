@@ -4,6 +4,8 @@ import { redirect } from "next/navigation";
 import prismadb from "@/app/libs/prismadb";
 import React from "react";
 
+
+
 export default async function SetupLayout({
   children,
 }: {
@@ -11,6 +13,8 @@ export default async function SetupLayout({
 }) {
   try {
     const session = await getServerSession(authOptions);
+
+    
 
     // Check if the session is valid
     if (!session?.user?.email) {

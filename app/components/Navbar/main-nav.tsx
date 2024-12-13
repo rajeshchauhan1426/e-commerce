@@ -20,6 +20,12 @@ export function MainNav({
       active: pathname === `/${storeId}/`,
     },
     {
+      href: `/${storeId}/billboards`, // Adjusted to match dynamic structure
+      label: "Billboards",
+      active: pathname === `/${storeId}/billboards`,
+    },
+    
+    {
       href: `/${storeId}/Settings`, // Adjusted to match dynamic structure
       label: "Settings",
       active: pathname === `/${storeId}/Settings`,
