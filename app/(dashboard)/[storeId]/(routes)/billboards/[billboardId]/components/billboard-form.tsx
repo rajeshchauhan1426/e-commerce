@@ -47,7 +47,7 @@ export const BillboardForm: React.FC<BillboardFormProps> = ({ initialData }) => 
     resolver: zodResolver(formSchema),
     defaultValues: {
       label: initialData?.label || "",
-      imageUrl: initialData?.imageUrl || [], // Ensure this is an array
+      imageUrl: initialData?.imageUrl || [],
     },
   });
 
@@ -63,17 +63,24 @@ export const BillboardForm: React.FC<BillboardFormProps> = ({ initialData }) => 
   const onSubmit = async (data: BillboardFormValues) => {
     try {
       setLoading(true);
+      let response;
       if (initialData) {
         if (storeId && billboardId) {
-          await axios.patch(`/api/${storeId}/billboards/${billboardId}`, data);
+          response = await axios.patch(`/api/${storeId}/billboards/${billboardId}`, data);
         }
       } else {
         if (storeId) {
-          await axios.post(`/api/${storeId}/billboards`, data);
+          response = await axios.post(`/api/${storeId}/billboards`, data);
         }
       }
       toast.success(toastMessage);
-      router.refresh();
+
+      if (!initialData && response?.data?.id) {
+        // Redirect to the new billboard's page
+        router.push(`/${storeId}/billboards`);
+      } else {
+        router.refresh(); // Refresh for edits
+      }
     } catch (error) {
       toast.error("Error saving billboard");
     } finally {
@@ -81,56 +88,12 @@ export const BillboardForm: React.FC<BillboardFormProps> = ({ initialData }) => 
     }
   };
 
-  const onDelete = async () => {
-    if (!initialData) return;
-
-    if (!open) {
-      setOpen(true);
-      return;
-    }
-
-    try {
-      setLoading(true);
-      if (storeId && billboardId) {
-        await axios.delete(`/api/${storeId}/billboards/${billboardId}`);
-      }
-      toast.success("Billboard deleted successfully");
-      router.push("/");
-    } catch (error) {
-      toast.error("Make sure you remove all product and categories first");
-    } finally {
-      setLoading(false);
-      setOpen(false);
-    }
-  };
-
   return (
     <>
       <div className="flex items-center justify-between">
         <Heading title={title} description={description} />
-        {initialData && (
-          <Button
-            variant="destructive"
-            size="icon"
-            onClick={onDelete}
-            disabled={loading}
-          >
-            <Trash className="h-4 w-4" />
-          </Button>
-        )}
       </div>
       <Separator />
-      {open && (
-        <div className="confirmation-modal space-x-2">
-          <p>Are you sure you want to delete this billboard?</p>
-          <Button onClick={onDelete} disabled={loading}>
-            Delete
-          </Button>
-          <Button onClick={() => setOpen(false)} disabled={loading}>
-            Cancel
-          </Button>
-        </div>
-      )}
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8 w-full">
           <FormField
@@ -141,7 +104,7 @@ export const BillboardForm: React.FC<BillboardFormProps> = ({ initialData }) => 
                 <FormLabel className="text-sm">Background image</FormLabel>
                 <FormControl>
                   <ImageUpload
-                    value={field.value} // Ensure this is an array
+                    value={field.value}
                     disabled={loading}
                     onChange={(url) => field.onChange([...field.value, url])}
                     onRemove={(url) =>
