@@ -24,6 +24,7 @@ import { useRouter } from "next/navigation";
 import { useParams } from "next/navigation";
 import { useOrigin } from "@/app/components/hooks/use-origin";
 import ImageUpload from "@/app/components/ui/image-upload";
+import { Modal } from "@/app/components/ui/modal"; // Add a Modal component to show confirmation.
 
 interface BillboardFormProps {
   initialData: Billboard | null;
@@ -40,7 +41,7 @@ export const BillboardForm: React.FC<BillboardFormProps> = ({ initialData }) => 
   const router = useRouter();
   const { storeId, billboardId } = useParams<{ storeId: string; billboardId: string }>() || {};
   const [loading, setLoading] = useState(false);
-  const [open, setOpen] = useState(false);
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const origin = useOrigin();
 
   const form = useForm<BillboardFormValues>({
@@ -60,6 +61,22 @@ export const BillboardForm: React.FC<BillboardFormProps> = ({ initialData }) => 
     : "Billboard created successfully";
   const actionLabel = initialData ? "Save Changes" : "Create Billboard";
 
+  const onDelete = async () => {
+    try {
+      setLoading(true);
+      if (storeId && billboardId) {
+        await axios.delete(`/api/${storeId}/billboards/${billboardId}`);
+        toast.success("Billboard deleted successfully");
+        router.push(`/${storeId}/billboards`); // Redirect after deletion.
+      }
+    } catch (error) {
+      toast.error("Error deleting billboard");
+    } finally {
+      setLoading(false);
+      setDeleteModalOpen(false);
+    }
+  };
+
   const onSubmit = async (data: BillboardFormValues) => {
     try {
       setLoading(true);
@@ -76,10 +93,9 @@ export const BillboardForm: React.FC<BillboardFormProps> = ({ initialData }) => 
       toast.success(toastMessage);
 
       if (!initialData && response?.data?.id) {
-        // Redirect to the new billboard's page
         router.push(`/${storeId}/billboards`);
       } else {
-        router.refresh(); // Refresh for edits
+        router.refresh();
       }
     } catch (error) {
       toast.error("Error saving billboard");
@@ -92,6 +108,16 @@ export const BillboardForm: React.FC<BillboardFormProps> = ({ initialData }) => 
     <>
       <div className="flex items-center justify-between">
         <Heading title={title} description={description} />
+        {initialData && (
+          <Button
+            variant="destructive"
+            onClick={() => setDeleteModalOpen(true)}
+            disabled={loading}
+          >
+            <Trash className="h-4 w-4 " />
+            
+          </Button>
+        )}
       </div>
       <Separator />
       <Form {...form}>
@@ -140,7 +166,23 @@ export const BillboardForm: React.FC<BillboardFormProps> = ({ initialData }) => 
           </Button>
         </form>
       </Form>
-      <Separator />
+      
+      <Modal
+  isOpen={deleteModalOpen}
+  setIsOpen={() => setDeleteModalOpen(false)} // Use the correct onClose prop
+  title="Confirm Deletion"
+  description="Are you sure you want to delete this billboard? This action cannot be undone."
+>
+  <div className="flex justify-end gap-4">
+    <Button variant="outline" onClick={() => setDeleteModalOpen(false)}>
+      Cancel
+    </Button>
+    <Button variant="destructive" onClick={onDelete} disabled={loading}>
+      Delete
+    </Button>
+  </div>
+</Modal>
+
     </>
   );
 };

@@ -6,7 +6,10 @@ import { Separator } from "@/app/components/ui/separator";
 import { Billboard } from "@prisma/client";
 import { Plus } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
-import { BillboardColumn } from "./columns";
+import { BillboardColumn, columns } from "./columns";
+import { DataTable } from "@/app/components/ui/data-table";
+import { ApiList } from "@/app/components/ui/api-list";
+
 
 interface BillboardClientProps{
   data: BillboardColumn[]
@@ -45,6 +48,11 @@ export const BillboardClient: React.FC<BillboardClientProps> = ({
         </Button>
       </div>
       <Separator />
+      <DataTable  searchKey="label" columns={columns} data={data}/>
+      <Heading title="API" description="API calls for Billboards" />
+      <Separator/>
+      <ApiList entityName="billboard" entityIdName="BillboardsId" />
     </>
   );
 };
+ 

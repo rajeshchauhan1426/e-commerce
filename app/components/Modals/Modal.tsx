@@ -4,32 +4,37 @@ import { useCallback, useEffect, useState } from "react";
 import { MdCancel } from "react-icons/md"; // Importing cancel icon from react-icons
 import Button from "../Button"; // Importing the custom Button component
 
-interface ModelProps {
-  isOpen?: boolean;
-  onclose: () => void;
-  onSubmit: () => void;
-  title?: string;
+interface ModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  onSubmit?: () => void;
+  title: string;
+  description?: string;
   body?: React.ReactElement;
   footer?: React.ReactElement;
-  actionLabel: string;
+  children?: React.ReactNode;
+  actionLabel?: string;
   disabled?: boolean;
   secondaryAction?: () => void;
   secondaryLabel?: string;
 }
 
-const Modal: React.FC<ModelProps> = ({
+const Modal: React.FC<ModalProps> = ({
   isOpen,
-  onclose,
+  onClose,
   onSubmit,
   title,
+  description,
   body,
   footer,
+  children,
   actionLabel,
   disabled,
   secondaryAction,
   secondaryLabel,
 }) => {
-  const [showModal, setShowModal] = useState(isOpen);
+  // Ensure the initial state of `showModal` is a boolean value
+  const [showModal, setShowModal] = useState<boolean>(isOpen);
 
   // Update showModal state when isOpen prop changes
   useEffect(() => {
@@ -38,90 +43,84 @@ const Modal: React.FC<ModelProps> = ({
 
   // Handle modal close action
   const handleClose = useCallback(() => {
-    if (disabled) {
-      return;
-    }
+    if (disabled) return;
     setShowModal(false);
     setTimeout(() => {
-      onclose();
+      onClose();
     }, 300);
-  }, [disabled, onclose]);
+  }, [disabled, onClose]);
 
   // Handle modal submit action
   const handleSubmit = useCallback(() => {
-    if (disabled) {
-      return;
-    }
+    if (disabled || !onSubmit) return;
     onSubmit();
   }, [disabled, onSubmit]);
 
   // Handle secondary action (if provided)
   const handleSecondaryAction = useCallback(() => {
-    if (disabled || !secondaryAction) {
-      return;
-    }
+    if (disabled || !secondaryAction) return;
     secondaryAction();
   }, [disabled, secondaryAction]);
 
-  // If modal is not open, don't render anything
-  if (!isOpen) {
-    return null;
-  }
+  if (!isOpen) return null;
 
   return (
-    <>
-      {/* Modal background overlay */}
-      <div className="justify-center items-center flex overflow-x-hidden overflow-y-auto fixed inset-0 z-50 outline-none focus:outline-none bg-neutral-800/70">
-        <div className="relative w-full md:w-4/6 lg:w-3/6 xl:w-2/5 my-6 mx-auto h-full lg:h-auto md:h-auto">
-          <div
-            className={`translate duration-300 h-full ${
-              showModal ? "translate-y-0" : "-translate-y-full"
-            } ${showModal ? "opacity-100" : "opacity-0"}`}
-          >
-            {/* Modal container */}
-            <div className="translate h-full lg:h-auto md:h-auto border-0 rounded-lg shadow-lg relative flex flex-col w-full bg-white outline-none focus:outline-none">
-              {/* Modal header */}
-              <div className="flex items-center p-6 rounded-t justify-center relative border-b-[1px]">
-                <button
-                  onClick={handleClose}
-                  className="p-1 border-0 hover:opacity-70 transition absolute left-9"
-                >
-                  <MdCancel /> {/* Cancel icon button */}
-                </button>
-                <div className="text-lg font-semibold">{title}</div> {/* Modal title */}
-              </div>
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-neutral-800/70">
+      <div className="relative w-full md:w-4/6 lg:w-3/6 xl:w-2/5 my-6 mx-auto h-full lg:h-auto md:h-auto">
+        <div
+          className={`transform duration-300 h-full ${
+            showModal ? "translate-y-0 opacity-100" : "-translate-y-full opacity-0"
+          }`}
+        >
+          <div className="relative flex flex-col w-full bg-white border-0 rounded-lg shadow-lg outline-none focus:outline-none">
+            {/* Header */}
+            <div className="flex items-center justify-between p-6 border-b">
+              <h2 className="text-lg font-semibold">{title}</h2>
+              <button
+                onClick={handleClose}
+                className="p-1 border-0 hover:opacity-70 transition"
+              >
+                <MdCancel className="w-6 h-6" />
+              </button>
+            </div>
 
-              {/* Modal body */}
-              <div className="relative p-6 flex-auto">{body}</div>
+            {/* Description (optional) */}
+            {description && (
+              <div className="px-6 text-sm text-gray-600">{description}</div>
+            )}
 
-              {/* Modal footer */}
-              <div className="flex flex-col gap-2 p-6">
-                <div className="flex flex-row items-center gap-4 w-full">
-                  {/* Secondary action button (if provided) */}
-                  {secondaryLabel && secondaryAction && (
-                    <Button
-                      outline
-                      disabled={disabled}
-                      label={secondaryLabel}
-                      onclick={handleSecondaryAction}
-                    />
-                  )}
-                  {/* Primary action button */}
+            {/* Body */}
+            {body && <div className="relative p-6 flex-auto">{body}</div>}
+
+            {/* Custom children */}
+            {children && <div className="relative p-6">{children}</div>}
+
+            {/* Footer */}
+            <div className="flex flex-col gap-2 p-6">
+              <div className="flex flex-row items-center gap-4 w-full">
+                {secondaryLabel && secondaryAction && (
+                  <Button
+                    outline
+                    disabled={disabled}
+                    label={secondaryLabel}
+                    onclick={handleSecondaryAction}
+                  />
+                )}
+                {actionLabel && (
                   <Button
                     disabled={disabled}
                     label={actionLabel}
                     onclick={handleSubmit}
                   />
-                </div>
+                )}
               </div>
-
-              {/* Custom footer (if provided) */}
-              {footer}
             </div>
+
+            {footer}
           </div>
         </div>
       </div>
-    </>
+    </div>
   );
 };
 
