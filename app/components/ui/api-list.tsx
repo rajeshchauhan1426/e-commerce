@@ -13,7 +13,7 @@ interface ApiListProps{
     entityIdName,
  }) => {
 
-    const { storeId, billboardId } = useParams<{ storeId: string; billboardId: string }>() || {};
+    const { storeId  } = useParams<{ storeId: string; }>() || {};
     const params = useParams();
     const origin = useOrigin();
     const baseURl = `${origin}/api/${storeId}`
