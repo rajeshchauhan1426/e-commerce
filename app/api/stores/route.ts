@@ -62,6 +62,8 @@ export async function GET() {
       return new NextResponse("Unauthorized: User not found", { status: 401 });
     }
 
+
+    
     // Fetch all stores associated with the user
     const stores = await prismadb.store.findMany({
       where: {
