@@ -39,7 +39,7 @@ type CategoryFormValues = z.infer<typeof formSchema>;
 
 export const CategoryForm: React.FC<CategoryFormProps> = ({ initialData, billboards }) => {
   const router = useRouter();
-  const { storeId, billboardId } = useParams() || {};
+  const { storeId, categoryId } = useParams() || {};
   const [loading, setLoading] = useState(false);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const origin = useOrigin();
@@ -64,8 +64,8 @@ export const CategoryForm: React.FC<CategoryFormProps> = ({ initialData, billboa
   const onDelete = async () => {
     try {
       setLoading(true);
-      if (storeId && billboardId) {
-        await axios.delete(`/api/${storeId}/categories/${billboardId}`);
+      if (storeId && categoryId) {
+        await axios.delete(`/api/${storeId}/categories/${categoryId}`);
         toast.success("Category deleted successfully");
         router.push(`/${storeId}/categories`);
       }
@@ -80,8 +80,8 @@ export const CategoryForm: React.FC<CategoryFormProps> = ({ initialData, billboa
   const onSubmit = async (data: CategoryFormValues) => {
     try {
       setLoading(true);
-      if (initialData && storeId && billboardId) {
-        await axios.patch(`/api/${storeId}/categories/${billboardId}`, data);
+      if (initialData && storeId && categoryId) {
+        await axios.patch(`/api/${storeId}/categories/${categoryId}`, data);
       } else if (storeId) {
         await axios.post(`/api/${storeId}/categories`, data);
       }
