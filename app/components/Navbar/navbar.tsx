@@ -14,23 +14,18 @@ interface NavbarProps {
 const Navbar: React.FC<NavbarProps> = ({ currentUser }) => {
   const pathname = usePathname();
   const [isLoading, setIsLoading] = useState(false);
-  const [prevPath, setPrevPath] = useState(pathname);
 
   useEffect(() => {
-    if (pathname !== prevPath) {
-      setIsLoading(true);
-      setPrevPath(pathname);
-      // Simulate loading time or tie it to actual data fetching
-      const timer = setTimeout(() => setIsLoading(false), 800); // 800ms for slower loading effect
-      return () => clearTimeout(timer);
-    }
-  }, [pathname, prevPath]);
+    setIsLoading(true);
+    const timer = setTimeout(() => setIsLoading(false), 1000); // 800ms for the loading effect
+    return () => clearTimeout(timer);
+  }, [pathname]); // Dependency array ensures it runs on pathname change
 
   return (
     <div className="border-b bg-white relative">
       {/* Loading Line */}
       {isLoading && (
-        <div className="absolute top-0 left-0 w-full h-[4px] bg-blue-600 animate-slow-pulse"></div>
+        <div className="absolute top-0 left-0 w-full h-[4px] bg-blue-600 animate-pulse"></div>
       )}
 
       <div className="flex flex-row items-center justify-between px-6 py-4">
