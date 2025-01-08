@@ -29,6 +29,11 @@ export function MainNav({
       label: "Categories",
       active: pathname === `/${storeId}/categories`,
     },
+    {
+      href: `/${storeId}/sizes`, // Adjusted to match dynamic structure
+      label: "Size",
+      active: pathname === `/${storeId}/categories`,
+    },
     
     {
       href: `/${storeId}/Settings`, // Adjusted to match dynamic structure

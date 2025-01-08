@@ -17,7 +17,7 @@ const Navbar: React.FC<NavbarProps> = ({ currentUser }) => {
 
   useEffect(() => {
     setIsLoading(true);
-    const timer = setTimeout(() => setIsLoading(false), 1000); // 800ms for the loading effect
+    const timer = setTimeout(() => setIsLoading(false), 1000); //for loading speed
     return () => clearTimeout(timer);
   }, [pathname]); // Dependency array ensures it runs on pathname change
 
