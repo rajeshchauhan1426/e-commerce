@@ -29,7 +29,7 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
 
   const onCopy = (id: string) => {
     navigator.clipboard.writeText(id);
-    toast.success("Billboard id Copied to the clipboard");
+    toast.success(" Category id Copied to the clipboard");
   };
 
   const onDelete = async () => {
@@ -37,11 +37,11 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
       setLoading(true);
       if (storeId) {
         await axios.delete(`/api/${storeId}/categories/${data.id}`);
-        toast.success("Billboard deleted successfully");
+        toast.success("Categories deleted successfully");
         router.refresh(); // Refresh the page to update the UI
       }
     } catch (error) {
-      toast.error("Error deleting billboard");
+      toast.error("Error deleting categories");
     } finally {
       setLoading(false);
     }
