@@ -3,7 +3,7 @@
 import { Button } from "@/app/components/ui/button";
 import { Heading } from "@/app/components/ui/heading";
 import { Separator } from "@/app/components/ui/separator";
-import { Billboard } from "@prisma/client";
+
 import { Plus } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
 import { SizeColumn, columns } from "./columns";
@@ -48,7 +48,7 @@ export const SizesClient: React.FC<SizesClientProps> = ({
         </Button>
       </div>
       <Separator />
-      <DataTable  searchKey="label" columns={columns} data={data}/>
+      <DataTable  searchKey="name" columns={columns} data={data}/>
       <Heading title="API" description="API calls for Sizes" />
       <Separator/>
       <ApiList entityName="sizes" entityIdName="sizesId" />

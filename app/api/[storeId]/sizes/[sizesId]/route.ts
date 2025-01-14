@@ -3,15 +3,15 @@ import { NextResponse } from "next/server";
 import prismadb from "@/app/libs/prismadb";
 import { authOptions } from "@/pages/api/auth/[...nextauth]";
 
-// PATCH Route: Update a specific billboard
+// PATCH Route: Update a specific size
 export async function PATCH(
   req: Request,
-  { params }: { params: { storeId: string; billboardId: string } }
+  { params }: { params: { storeId: string; sizeId: string } }
 ) {
   try {
     const session = await getServerSession(authOptions);
     const body = await req.json();
-    const { label, imageUrl } = body;
+    const { name, value } = body;
 
     // Validate session
     if (!session || !session.user?.email) {
@@ -28,12 +28,16 @@ export async function PATCH(
     }
 
     // Validate input data
-    if (!params.storeId || !params.billboardId) {
-      return new NextResponse("Store ID and Billboard ID are required", { status: 400 });
+    if (!name) {
+      return new NextResponse("Name is required", { status: 400 });
+    }
+    if (!value) {
+      return new NextResponse("Value is required", { status: 400 });
     }
 
-    if (!label || !imageUrl) {
-      return new NextResponse("Label and Image URL are required", { status: 400 });
+    // Validate if storeId and sizeId are provided in params
+    if (!params.storeId || !params.sizeId) {
+      return new NextResponse("Store ID and Size ID are required", { status: 400 });
     }
 
     // Check if the store belongs to the user
@@ -48,28 +52,30 @@ export async function PATCH(
       return new NextResponse("Unauthorized", { status: 403 });
     }
 
-    // Update the billboard
-    const billboard = await prismadb.billboard.update({
-      where: { id: params.billboardId },
-      data: { label, imageUrl },
+    // Update the size
+    const size = await prismadb.size.updateMany({
+      where: { id: params.sizeId },
+      data: { name, value },
     });
 
-    return NextResponse.json(billboard);
+    return NextResponse.json(size);
   } catch (error) {
-    console.error("[BILLBOARD_PATCH]", error);
+    console.error("[SIZES_PATCH]", error);
     return new NextResponse("Internal error", { status: 500 });
   }
 }
 
-// DELETE Route: Delete a specific billboard
+// DELETE Route: Delete a specific size
 export async function DELETE(
   req: Request,
-  { params }: { params: { storeId: string; billboardId: string } }
+  { params }: { params: { storeId: string; sizeId: string } }
 ) {
   try {
-    const session = await getServerSession(authOptions);
+    // Validate params
+    const { storeId, sizeId } = params;
 
     // Validate session
+    const session = await getServerSession(authOptions);
     if (!session || !session.user?.email) {
       return new NextResponse("Unauthorized", { status: 401 });
     }
@@ -84,14 +90,18 @@ export async function DELETE(
     }
 
     // Validate parameters
-    if (!params.storeId || !params.billboardId) {
-      return new NextResponse("Store ID and Billboard ID are required", { status: 400 });
+    if (!storeId) {
+      return new NextResponse("Store ID is required", { status: 400 });
+    }
+
+    if(!sizeId){
+      return new NextResponse("Size Id is required", {status:400})
     }
 
     // Check if the store belongs to the user
     const storeByUserId = await prismadb.store.findFirst({
       where: {
-        id: params.storeId,
+        id: storeId,
         userId: user.id,
       },
     });
@@ -100,36 +110,43 @@ export async function DELETE(
       return new NextResponse("Unauthorized", { status: 403 });
     }
 
-    // Delete the billboard
-    await prismadb.billboard.delete({
-      where: { id: params.billboardId },
+    // Check if the size exists and belongs to the store
+    const size = await prismadb.size.findFirst({
+      where: {
+        id: sizeId,
+        storeId: storeId,
+      },
     });
 
-    return new NextResponse("Billboard deleted successfully", { status: 200 });
+    if (!size) {
+      return new NextResponse("Size not found or does not belong to the store", { status: 404 });
+    }
+
+    // Delete the size
+    await prismadb.size.delete({
+      where: { id: sizeId },
+    });
+
+    return new NextResponse("Size deleted successfully", { status: 200 });
   } catch (error) {
-    console.error("[BILLBOARD_DELETE]", error);
+    console.error("[SIZE_DELETE]", error);
     return new NextResponse("Internal error", { status: 500 });
   }
 }
 
-// GET Route: Fetch a specific billboard
+// GET Route: Fetch a specific size
 export async function GET(
   req: Request,
-  { params }: { params: { storeId: string; billboardId: string } }
+  { params }: { params: { storeId: string; sizeId: string } }
 ) {
   try {
-    // Validate if storeId and billboardId are provided in the URL parameters
-    if (!params.storeId) {
-      return new NextResponse("Store ID is required", { status: 400 });
-    }
-
-    if (!params.billboardId) {
-      return new NextResponse("Billboard ID is required", { status: 400 });
+    // Validate if sizeId is provided in the URL parameters
+    if (!params.sizeId) {
+      return new NextResponse("Size ID is required", { status: 400 });
     }
 
     // Retrieve the user session
     const session = await getServerSession(authOptions);
-
     if (!session || !session.user?.email) {
       return new NextResponse("Unauthenticated", { status: 401 });
     }
@@ -155,20 +172,19 @@ export async function GET(
       return new NextResponse("Unauthorized", { status: 403 });
     }
 
-    // Retrieve the billboard based on the billboardId and storeId
-    const billboard = await prismadb.billboard.findUnique({
-      where: { id: params.billboardId },
+    // Retrieve the size based on the sizeId and storeId
+    const size = await prismadb.size.findUnique({
+      where: { id: params.sizeId },
     });
 
-    // Ensure the billboard exists and belongs to the provided storeId
-    if (!billboard || billboard.storeId !== params.storeId) {
-      return new NextResponse("Billboard not found", { status: 404 });
+    if (!size) {
+      return new NextResponse("Size not found", { status: 404 });
     }
 
-    // Return the found billboard
-    return NextResponse.json(billboard);
+    // Return the found size
+    return NextResponse.json(size);
   } catch (error) {
-    console.error("[BILLBOARD_GET]", error);
+    console.error("[SIZES_GET]", error);
     return new NextResponse("Internal error", { status: 500 });
   }
 }

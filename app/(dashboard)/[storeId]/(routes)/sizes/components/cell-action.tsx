@@ -14,34 +14,38 @@ import toast from "react-hot-toast";
 import { useParams, useRouter } from "next/navigation";
 import { useState } from "react";
 import axios from "axios";
-import { BillboardColumn } from "../../billboards/components/columns";
+
+import { SizeColumn } from "./columns";
 
 interface CellActionProps {
-  data: BillboardColumn;
+  data: SizeColumn;
 }
 
 export const CellAction: React.FC<CellActionProps> = ({ data }) => {
   const router = useRouter();
   const params = useParams();
-  const storeId = params?.storeId;
+  const storeId = params?.storeId; // Retrieve the storeId from the URL parameters
 
   const [loading, setLoading] = useState(false);
 
   const onCopy = (id: string) => {
     navigator.clipboard.writeText(id);
-    toast.success("Sizes id   Copied to the clipboard");
+    toast.success("Size ID copied to the clipboard");
   };
 
   const onDelete = async () => {
     try {
       setLoading(true);
       if (storeId) {
+        // Updated API path based on your clarification
         await axios.delete(`/api/${storeId}/sizes/${data.id}`);
-        toast.success("sizes deleted successfully");
+        toast.success("Size deleted successfully");
         router.refresh(); // Refresh the page to update the UI
+      } else {
+        toast.error("Store ID is missing");
       }
     } catch (error) {
-      toast.error("Error deleting billboard");
+      toast.error("Failed to delete size. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -56,18 +60,18 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
-        <DropdownMenuLabel>Action</DropdownMenuLabel>
+        <DropdownMenuLabel>Actions</DropdownMenuLabel>
         <DropdownMenuItem onClick={() => onCopy(data.id)}>
           <Copy className="mr-2 h-4 w-4" />
-          Copy Id
+          Copy ID
         </DropdownMenuItem>
         <DropdownMenuItem onClick={() => router.push(`/${storeId}/sizes/${data.id}`)}>
           <Edit className="mr-2 h-4 w-4" />
           Update
         </DropdownMenuItem>
-        <DropdownMenuItem onClick={onDelete}>
+        <DropdownMenuItem onClick={onDelete} disabled={loading}>
           <Trash className="mr-2 h-4 w-4" />
-          Delete
+          {loading ? "Deleting..." : "Delete"}
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

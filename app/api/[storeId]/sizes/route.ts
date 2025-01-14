@@ -53,7 +53,7 @@ export async function POST(req: Request, context: { params: Params }) {
     }
 
     // Step 6: Create the size
-    const size = await prismadb.size.create({
+    const sizes = await prismadb.size.create({
       data: {
         name,
          value,
@@ -62,9 +62,9 @@ export async function POST(req: Request, context: { params: Params }) {
     });
 
     // Step 7: Return the created billboard
-    return NextResponse.json(size);
+    return NextResponse.json(sizes);
   } catch (error) {
-    console.error("[SIZE_POST] Error:", error);
+    console.error("[SIZES_POST] Error:", error);
     return new NextResponse("Internal Server Error", { status: 500 });
   }
 }

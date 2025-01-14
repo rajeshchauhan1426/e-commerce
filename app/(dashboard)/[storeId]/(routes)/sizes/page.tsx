@@ -23,7 +23,7 @@ const SizesPage = async({
         id:item.id,
         name: item.name,
         value: item.value,
-        createdAt: format(item.createdAt, "MMM do, yyyyy")
+        createdAt: format(item.createdAt, "MMM do, yyyy")
 
      }))
 
