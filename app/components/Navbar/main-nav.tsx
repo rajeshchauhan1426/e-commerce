@@ -31,17 +31,15 @@ export function MainNav({
     },
     {
       href: `/${storeId}/sizes`, // Adjusted to match dynamic structure
-      label: "Size",
-      active: pathname === `/${storeId}/categories`,
+      label: "Sizes",
+      active: pathname === `/${storeId}/sizes`, // Ensures case-insensitive comparison
     },
-    
     {
-      href: `/${storeId}/Settings`, // Adjusted to match dynamic structure
+      href: `/${storeId}/settings`, // Adjusted to match dynamic structure
       label: "Settings",
-      active: pathname === `/${storeId}/Settings`,
+      active: pathname === `/${storeId}/settings`, // Ensures case-insensitive comparison
     },
   ];
-  ;
 
   return (
     <nav className={cn("flex items-center space-x-4 lg:space-x-6", className)}>

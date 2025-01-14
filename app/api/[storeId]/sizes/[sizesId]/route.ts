@@ -2,11 +2,12 @@ import { getServerSession } from "next-auth/next";
 import { NextResponse } from "next/server";
 import prismadb from "@/app/libs/prismadb";
 import { authOptions } from "@/pages/api/auth/[...nextauth]";
+import { json } from "stream/consumers";
 
-// PATCH Route: Update a specific size
+// PATCH Route: Update a specific billboard
 export async function PATCH(
   req: Request,
-  { params }: { params: { storeId: string; sizeId: string } }
+  { params }: { params: { storeId: string; sizeId: string} }
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -28,17 +29,15 @@ export async function PATCH(
     }
 
     // Validate input data
-    if (!name) {
-      return new NextResponse("Name is required", { status: 400 });
+    if(!name){
+      return new NextResponse("Name is required", {status: 400})
     }
-    if (!value) {
-      return new NextResponse("Value is required", { status: 400 });
-    }
-
-    // Validate if storeId and sizeId are provided in params
-    if (!params.storeId || !params.sizeId) {
-      return new NextResponse("Store ID and Size ID are required", { status: 400 });
-    }
+    if(!value){
+      return new NextResponse("Value is required",{status: 400})
+   }
+   if(!params.sizeId){
+    return new NextResponse("Size id is rewquired")
+   }
 
     // Check if the store belongs to the user
     const storeByUserId = await prismadb.store.findFirst({
@@ -52,10 +51,10 @@ export async function PATCH(
       return new NextResponse("Unauthorized", { status: 403 });
     }
 
-    // Update the size
-    const size = await prismadb.size.updateMany({
+    // Update the billboard
+    const size= await prismadb.size.updateMany({
       where: { id: params.sizeId },
-      data: { name, value },
+      data: { name, value},
     });
 
     return NextResponse.json(size);
@@ -65,17 +64,15 @@ export async function PATCH(
   }
 }
 
-// DELETE Route: Delete a specific size
+// DELETE Route: Delete a specific billboard
 export async function DELETE(
   req: Request,
   { params }: { params: { storeId: string; sizeId: string } }
 ) {
   try {
-    // Validate params
-    const { storeId, sizeId } = params;
+    const session = await getServerSession(authOptions);
 
     // Validate session
-    const session = await getServerSession(authOptions);
     if (!session || !session.user?.email) {
       return new NextResponse("Unauthorized", { status: 401 });
     }
@@ -90,18 +87,14 @@ export async function DELETE(
     }
 
     // Validate parameters
-    if (!storeId) {
-      return new NextResponse("Store ID is required", { status: 400 });
-    }
-
-    if(!sizeId){
-      return new NextResponse("Size Id is required", {status:400})
+    if (!params.sizeId) {
+      return new NextResponse("Size Id are required", { status: 400 });
     }
 
     // Check if the store belongs to the user
     const storeByUserId = await prismadb.store.findFirst({
       where: {
-        id: storeId,
+        id: params.storeId,
         userId: user.id,
       },
     });
@@ -110,43 +103,35 @@ export async function DELETE(
       return new NextResponse("Unauthorized", { status: 403 });
     }
 
-    // Check if the size exists and belongs to the store
-    const size = await prismadb.size.findFirst({
-      where: {
-        id: sizeId,
-        storeId: storeId,
-      },
-    });
-
-    if (!size) {
-      return new NextResponse("Size not found or does not belong to the store", { status: 404 });
-    }
-
     // Delete the size
-    await prismadb.size.delete({
-      where: { id: sizeId },
+     const size= await prismadb.size.deleteMany({
+     where:{
+      id: params.sizeId
+     }
     });
 
-    return new NextResponse("Size deleted successfully", { status: 200 });
+    return  NextResponse.json(size);
   } catch (error) {
-    console.error("[SIZE_DELETE]", error);
+    console.error("[SIZES_DELETE]", error);
     return new NextResponse("Internal error", { status: 500 });
   }
 }
 
-// GET Route: Fetch a specific size
+// GET Route: Fetch a specific billboard
 export async function GET(
   req: Request,
-  { params }: { params: { storeId: string; sizeId: string } }
+  { params }: { params: { sizeId: string } }
 ) {
   try {
-    // Validate if sizeId is provided in the URL parameters
+    // Validate if storeId and billboardId are provided in the URL parameters
     if (!params.sizeId) {
       return new NextResponse("Size ID is required", { status: 400 });
     }
 
+
     // Retrieve the user session
     const session = await getServerSession(authOptions);
+
     if (!session || !session.user?.email) {
       return new NextResponse("Unauthenticated", { status: 401 });
     }
@@ -163,7 +148,7 @@ export async function GET(
     // Check if the store belongs to the user
     const storeByUserId = await prismadb.store.findFirst({
       where: {
-        id: params.storeId,
+        id: params.sizeId,
         userId: user.id,
       },
     });
@@ -172,17 +157,15 @@ export async function GET(
       return new NextResponse("Unauthorized", { status: 403 });
     }
 
-    // Retrieve the size based on the sizeId and storeId
-    const size = await prismadb.size.findUnique({
-      where: { id: params.sizeId },
+    // Retrieve the billboard based on the billboardId and storeId
+    const sizes = await prismadb.size.findUnique({
+      where: { id: params.sizeId},
     });
 
-    if (!size) {
-      return new NextResponse("Size not found", { status: 404 });
-    }
+   
 
-    // Return the found size
-    return NextResponse.json(size);
+    // Return the found billboard
+    return NextResponse.json(sizes);
   } catch (error) {
     console.error("[SIZES_GET]", error);
     return new NextResponse("Internal error", { status: 500 });
