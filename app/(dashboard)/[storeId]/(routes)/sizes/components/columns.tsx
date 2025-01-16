@@ -4,21 +4,16 @@ import { ColumnDef } from "@tanstack/react-table"
 import { CellAction } from "./cell-action"
 
 
-export type SizeColumn = {
+export type BillboardColumn = {
   id: string
-  name: string
-  value: string
+  label: string
   createdAt: string
 }
 
-export const columns: ColumnDef<SizeColumn>[] = [
+export const columns: ColumnDef<BillboardColumn>[] = [
   {
-    accessorKey: "name",
-    header: "Name",
-  },
-  {
-    accessorKey: "value",
-    header: "Value",
+    accessorKey: "label",
+    header: "Label",
   },
   {
     accessorKey: "createdAt",

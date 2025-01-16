@@ -3,19 +3,19 @@
 import { Button } from "@/app/components/ui/button";
 import { Heading } from "@/app/components/ui/heading";
 import { Separator } from "@/app/components/ui/separator";
-
+import { Billboard } from "@prisma/client";
 import { Plus } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
-import { SizeColumn, columns } from "./columns";
+import { BillboardColumn, columns } from "./columns";
 import { DataTable } from "@/app/components/ui/data-table";
 import { ApiList } from "@/app/components/ui/api-list";
 
 
-interface SizesClientProps{
-  data: SizeColumn[]
+interface BillboardClientProps{
+  data: BillboardColumn[]
 }
 
-export const SizesClient: React.FC<SizesClientProps> = ({
+export const BillboardClient: React.FC<BillboardClientProps> = ({
   data
 }) => {
   const router = useRouter();
@@ -39,19 +39,19 @@ export const SizesClient: React.FC<SizesClientProps> = ({
     <>
       <div className="flex items-center justify-between">
         <Heading
-          title={`Sizes (${data.length})`}
-          description="Manage Sizes for your store"
+          title={`Billboards (${data.length})`}
+          description="Manage billboards for your store"
         />
-        <Button onClick={() => router.push(`/${storeId}/sizes/new`)}>
+        <Button onClick={() => router.push(`/${storeId}/billboards/new`)}>
           <Plus className="mr-2 h-4 w-4" />
           Add New
         </Button>
       </div>
       <Separator />
-      <DataTable  searchKey="name" columns={columns} data={data}/>
-      <Heading title="API" description="API calls for Sizes" />
+      <DataTable  searchKey="label" columns={columns} data={data}/>
+      <Heading title="API" description="API calls for Billboards" />
       <Separator/>
-      <ApiList entityName="sizes" entityIdName="sizesId" />
+      <ApiList entityName="billboard" entityIdName="BillboardsId" />
     </>
   );
 };

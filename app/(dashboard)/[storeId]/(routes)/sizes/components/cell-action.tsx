@@ -7,7 +7,7 @@ import {
   DropdownMenuLabel,
   DropdownMenuTrigger,
 } from "@/app/components/ui/dropdown-menu";
-
+import { BillboardColumn } from "./columns";
 import { Button } from "@/app/components/ui/button";
 import { Copy, Edit, MoreHorizontal, Trash } from "lucide-react";
 import toast from "react-hot-toast";
@@ -15,37 +15,32 @@ import { useParams, useRouter } from "next/navigation";
 import { useState } from "react";
 import axios from "axios";
 
-import { SizeColumn } from "./columns";
-
 interface CellActionProps {
-  data: SizeColumn;
+  data: BillboardColumn;
 }
 
 export const CellAction: React.FC<CellActionProps> = ({ data }) => {
   const router = useRouter();
   const params = useParams();
-  const storeId = params?.storeId; // Retrieve the storeId from the URL parameters
+  const storeId = params?.storeId;
 
   const [loading, setLoading] = useState(false);
 
   const onCopy = (id: string) => {
     navigator.clipboard.writeText(id);
-    toast.success("Size ID copied to the clipboard");
+    toast.success("Billboard id Copied to the clipboard");
   };
 
   const onDelete = async () => {
     try {
       setLoading(true);
       if (storeId) {
-        // Updated API path based on your clarification
-        await axios.delete(`/api/${storeId}/sizes/${data.id}`);
-        toast.success("Size deleted successfully");
+        await axios.delete(`/api/${storeId}/billboards/${data.id}`);
+        toast.success("Billboard deleted successfully");
         router.refresh(); // Refresh the page to update the UI
-      } else {
-        toast.error("Store ID is missing");
       }
     } catch (error) {
-      toast.error("Failed to delete size. Please try again.");
+      toast.error("Error deleting billboard");
     } finally {
       setLoading(false);
     }
@@ -60,18 +55,18 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
-        <DropdownMenuLabel>Actions</DropdownMenuLabel>
+        <DropdownMenuLabel>Action</DropdownMenuLabel>
         <DropdownMenuItem onClick={() => onCopy(data.id)}>
           <Copy className="mr-2 h-4 w-4" />
-          Copy ID
+          Copy Id
         </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => router.push(`/${storeId}/sizes/${data.id}`)}>
+        <DropdownMenuItem onClick={() => router.push(`/${storeId}/billboards/${data.id}`)}>
           <Edit className="mr-2 h-4 w-4" />
           Update
         </DropdownMenuItem>
-        <DropdownMenuItem onClick={onDelete} disabled={loading}>
+        <DropdownMenuItem onClick={onDelete}>
           <Trash className="mr-2 h-4 w-4" />
-          {loading ? "Deleting..." : "Delete"}
+          Delete
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

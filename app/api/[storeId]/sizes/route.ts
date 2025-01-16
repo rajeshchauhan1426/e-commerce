@@ -28,14 +28,14 @@ export async function POST(req: Request, context: { params: Params }) {
 
     // Step 3: Parse request body
     const body = await req.json();
-    const { name, value } = body;
+    const { label, imageUrl } = body;
 
     // Step 4: Validate input fields
-    if (!name) {
-      return new NextResponse("name is required", { status: 400 });
+    if (!label) {
+      return new NextResponse("Label is required", { status: 400 });
     }
-    if (!value ) {
-      return new NextResponse("Value is required", { status: 400 });
+    if (!imageUrl || !Array.isArray(imageUrl) || imageUrl.length === 0) {
+      return new NextResponse("At least one image URL is required", { status: 400 });
     }
 
     const { storeId } = context.params;
@@ -52,19 +52,20 @@ export async function POST(req: Request, context: { params: Params }) {
       return new NextResponse("Unauthorized", { status: 403 });
     }
 
-    // Step 6: Create the size
-    const sizes = await prismadb.size.create({
+    // Step 6: Create the billboard
+    const billboard = await prismadb.billboard.create({
       data: {
-        name,
-         value,
+        label,
+        imageUrl, // Store the array of image URLs
+        createdUrl: imageUrl[0], // Assign the first image as the `createdUrl`
         storeId,
       },
     });
 
     // Step 7: Return the created billboard
-    return NextResponse.json(sizes);
+    return NextResponse.json(billboard);
   } catch (error) {
-    console.error("[SIZES_POST] Error:", error);
+    console.error("[BILLBOARDS_POST] Error:", error);
     return new NextResponse("Internal Server Error", { status: 500 });
   }
 }
