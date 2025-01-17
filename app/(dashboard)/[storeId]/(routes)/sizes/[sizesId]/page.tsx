@@ -1,30 +1,30 @@
 import React from 'react'
 import prismadb from "@/app/libs/prismadb"
-import { BillboardForm } from './components/billboard-form'
+import { SizeForm } from './components/size-form'
 
 
 
-const BillboardPage = async({
+const SizePage = async({
 params 
 }: {
-    params: {billboardId: string}
+    params: {sizeId: string}
 }) => {
     
-    const billboard = await prismadb.billboard.findUnique({
+    const size = await prismadb.size.findFirst({
         where:{
-            id:params.billboardId
+            id:params.sizeId
         }
     })
   return (
     <div className='flex-col'>
     <div className='flex-1 space-y-4 p-8 pt-6'>
 
-         <BillboardForm
-         initialData={billboard}
+         <SizeForm
+         initialData={size}
          />
         </div>
         </div>
   )
 }
 
-export default BillboardPage
+export default SizePage

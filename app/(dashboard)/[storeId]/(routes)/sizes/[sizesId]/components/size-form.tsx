@@ -3,7 +3,7 @@
 import { Button } from "@/app/components/ui/button";
 import { Heading } from "@/app/components/ui/heading";
 import { Separator } from "@/app/components/ui/separator";
-import { Billboard } from "@prisma/client";
+import { Billboard, Size } from "@prisma/client";
 import { Trash } from "lucide-react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -26,29 +26,29 @@ import { useOrigin } from "@/app/components/hooks/use-origin";
 import ImageUpload from "@/app/components/ui/image-upload";
 import { Modal } from "@/app/components/ui/modal"; // Add a Modal component to show confirmation.
 
-interface BillboardFormProps {
-  initialData: Billboard | null;
+interface SizeFormProps {
+  initialData: Size | null;
 }
 
 const formSchema = z.object({
-  label: z.string().min(1, "Billboard label is required"),
-  imageUrl: z.array(z.string().url("Each image must be a valid URL")),
+  name: z.string().min(1),
+  value: z.string().min(1),
 });
 
-type BillboardFormValues = z.infer<typeof formSchema>;
+type SizeFormValues = z.infer<typeof formSchema>;
 
-export const BillboardForm: React.FC<BillboardFormProps> = ({ initialData }) => {
+export const SizeForm: React.FC<SizeFormProps> = ({ initialData }) => {
   const router = useRouter();
   const { storeId, billboardId } = useParams<{ storeId: string; billboardId: string }>() || {};
   const [loading, setLoading] = useState(false);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const origin = useOrigin();
 
-  const form = useForm<BillboardFormValues>({
+  const form = useForm<SizeFormValues>({
     resolver: zodResolver(formSchema),
-    defaultValues: {
-      label: initialData?.label || "",
-      imageUrl: initialData?.imageUrl || [],
+    defaultValues:{
+      name: '',
+      value: '',
     },
   });
 
@@ -77,7 +77,7 @@ export const BillboardForm: React.FC<BillboardFormProps> = ({ initialData }) => 
     }
   };
 
-  const onSubmit = async (data: BillboardFormValues) => {
+  const onSubmit = async (data: SizeFormValues) => {
     try {
       setLoading(true);
       let response;
@@ -122,7 +122,7 @@ export const BillboardForm: React.FC<BillboardFormProps> = ({ initialData }) => 
       <Separator />
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8 w-full">
-          <FormField
+          {/* <FormField
             control={form.control}
             name="imageUrl"
             render={({ field }) => (
@@ -141,11 +141,11 @@ export const BillboardForm: React.FC<BillboardFormProps> = ({ initialData }) => 
                 <FormMessage />
               </FormItem>
             )}
-          />
+          /> */}
           <div className="grid grid-cols-1 gap-8">
             <FormField
               control={form.control}
-              name="label"
+              name="name"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel className="text-sm">Billboard Label</FormLabel>
