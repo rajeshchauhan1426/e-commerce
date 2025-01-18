@@ -1,16 +1,17 @@
-import prismadb from "@/app/libs/prismadb";
-import { authOptions } from "@/pages/api/auth/[...nextauth]";
 import { getServerSession } from "next-auth/next";
 import { NextResponse } from "next/server";
+import prismadb from "@/app/libs/prismadb";
+import { authOptions } from "@/pages/api/auth/[...nextauth]";
 
+// PATCH Route: Update a specific billboard
 export async function PATCH(
   req: Request,
-  { params }: { params: { storeId: string; categoryId: string } }
+  { params }: { params: { storeId: string; sizeId: string } }
 ) {
   try {
     const session = await getServerSession(authOptions);
     const body = await req.json();
-    const { name, billboardId } = body;
+    const { name, value } = body;
 
     // Validate session
     if (!session || !session.user?.email) {
@@ -27,12 +28,12 @@ export async function PATCH(
     }
 
     // Validate input data
-    if (!params.storeId || !params.categoryId) {
-      return new NextResponse("Store ID and Category ID are required", { status: 400 });
+    if (!params.storeId || !params.sizeId) {
+      return new NextResponse("Store ID and size ID are required", { status: 400 });
     }
 
-    if (!name && !billboardId) {
-      return new NextResponse("At least one of 'name' or 'billboardId' is required", { status: 400 });
+    if (!name || !value) {
+      return new NextResponse("Name and Value are required", { status: 400 });
     }
 
     // Check if the store belongs to the user
@@ -47,28 +48,23 @@ export async function PATCH(
       return new NextResponse("Unauthorized", { status: 403 });
     }
 
-    // Prepare the data to be updated
-    const updateData: { name?: string; billboardId?: string } = {};
-    if (name) updateData.name = name;
-    if (billboardId) updateData.billboardId = billboardId;
-
-    // Update the category
-    const category = await prismadb.category.update({
-      where: { id: params.categoryId },
-      data: updateData,
+    // Update the billboard
+    const size = await prismadb.size.update({
+      where: { id: params.sizeId },
+      data: { name, value },
     });
 
-    return NextResponse.json(category);
+    return NextResponse.json(size);
   } catch (error) {
-    console.error("[CATEGORY_PATCH]", error);
+    console.error("[SIZE_PATCH]", error);
     return new NextResponse("Internal error", { status: 500 });
   }
 }
 
-// DELETE Route: Delete a specific category
+// DELETE Route: Delete a specific billboard
 export async function DELETE(
   req: Request,
-  { params }: { params: { storeId: string; categoryId: string } }
+  { params }: { params: { storeId: string; sizeId: string } }
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -88,8 +84,8 @@ export async function DELETE(
     }
 
     // Validate parameters
-    if (!params.storeId || !params.categoryId) {
-      return new NextResponse("Store ID and Category ID are required", { status: 400 });
+    if (!params.storeId || !params.sizeId) {
+      return new NextResponse("Store ID and size ID are required", { status: 400 });
     }
 
     // Check if the store belongs to the user
@@ -104,43 +100,31 @@ export async function DELETE(
       return new NextResponse("Unauthorized", { status: 403 });
     }
 
-    // Check if the category exists and belongs to the store
-    const category = await prismadb.category.findFirst({
-      where: {
-        id: params.categoryId,
-        storeId: params.storeId,
-      },
+    // Delete the billboard
+    await prismadb.size.delete({
+      where: { id: params.sizeId },
     });
 
-    if (!category) {
-      return new NextResponse("Category not found or does not belong to the store", { status: 404 });
-    }
-
-    // Delete the category
-    await prismadb.category.delete({
-      where: { id: params.categoryId },
-    });
-
-    return new NextResponse("Category deleted successfully", { status: 200 });
+    return new NextResponse("size deleted successfully", { status: 200 });
   } catch (error) {
-    console.error("[CATEGORY_DELETE]", error);
+    console.error("[SIZE_DELETE]", error);
     return new NextResponse("Internal error", { status: 500 });
   }
 }
 
-// GET Route: Fetch a specific category
+// GET Route: Fetch a specific billboard
 export async function GET(
   req: Request,
-  { params }: { params: { storeId: string; categoryId: string } }
+  { params }: { params: { storeId: string; sizeId: string } }
 ) {
   try {
-    // Validate if storeId and categoryId are provided in the URL parameters
+    // Validate if storeId and billboardId are provided in the URL parameters
     if (!params.storeId) {
       return new NextResponse("Store ID is required", { status: 400 });
     }
 
-    if (!params.categoryId) {
-      return new NextResponse("Category ID is required", { status: 400 });
+    if (!params.sizeId) {
+      return new NextResponse("size ID is required", { status: 400 });
     }
 
     // Retrieve the user session
@@ -171,20 +155,16 @@ export async function GET(
       return new NextResponse("Unauthorized", { status: 403 });
     }
 
-    // Retrieve the category based on the categoryId and storeId
-    const category = await prismadb.category.findUnique({
-      where: { id: params.categoryId },
+    // Retrieve the billboard based on the billboardId and storeId
+    const size = await prismadb.size.findUnique({
+      where: { id: params.sizeId },
     });
 
-    // Ensure the category exists and belongs to the provided storeId
-    if (!category || category.storeId !== params.storeId) {
-      return new NextResponse("Category not found", { status: 404 });
-    }
 
-    // Return the found category
-    return NextResponse.json(category);
+    // Return the found billboard
+    return NextResponse.json(size);
   } catch (error) {
-    console.error("[CATEGORY_GET]", error);
+    console.error("[SIZE_GET]", error);
     return new NextResponse("Internal error", { status: 500 });
   }
 }

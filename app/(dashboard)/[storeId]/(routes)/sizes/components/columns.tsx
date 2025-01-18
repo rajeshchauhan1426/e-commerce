@@ -2,25 +2,23 @@
 
 import { ColumnDef } from "@tanstack/react-table"
 import { CellAction } from "./cell-action"
-import { headers } from "next/headers"
 
 
-export type CategoryColumn = {
+export type SizeColumn = {
   id: string
   name: string
-  billboardLabel: string
+  value: string
   createdAt: string
 }
 
-export const columns: ColumnDef<CategoryColumn>[] = [
+export const columns: ColumnDef<SizeColumn>[] = [
   {
     accessorKey: "name",
     header: "Name",
   },
   {
-    accessorKey: "billboard",
-    header: "Billboard",
-    cell:({row}) => row.original.billboardLabel,
+    accessorKey: "value",
+    header: "Value",
   },
   {
     accessorKey: "createdAt",

@@ -1,8 +1,7 @@
+import { getServerSession } from "next-auth";
+import { NextResponse } from "next/server";
 import prismadb from "@/app/libs/prismadb";
 import { authOptions } from "@/pages/api/auth/[...nextauth]";
-import { getServerSession } from "next-auth";
-
-import { NextResponse } from "next/server";
 
 interface Params {
   storeId: string;
@@ -29,21 +28,17 @@ export async function POST(req: Request, context: { params: Params }) {
 
     // Step 3: Parse request body
     const body = await req.json();
-    const { name, billboardId } = body;
+    const { name, value } = body;
 
     // Step 4: Validate input fields
     if (!name) {
       return new NextResponse("Name is required", { status: 400 });
     }
-    if (!billboardId) {
-      return new NextResponse("Billboard is required", { status: 400 });
+    if (!value) {
+      return new NextResponse("Value is required", { status: 400 });
     }
 
     const { storeId } = context.params;
-
-    if (!storeId) {
-      return new NextResponse("Store ID is required", { status: 400 });
-    }
 
     // Step 5: Verify ownership of the store
     const storeByUserId = await prismadb.store.findFirst({
@@ -57,19 +52,39 @@ export async function POST(req: Request, context: { params: Params }) {
       return new NextResponse("Unauthorized", { status: 403 });
     }
 
-    // Step 6: Create the category
-    const category = await prismadb.category.create({
+    // Step 6: Create the size
+    const size = await prismadb.size.create({
       data: {
         name,
-        billboardId,
+        value, // Store the array of image URLs
         storeId,
       },
     });
 
-    // Step 7: Return the created category
-    return NextResponse.json(category);
+    // Step 7: Return the created billboard
+    return NextResponse.json(size);
   } catch (error) {
-    console.error("[CATEGORIES_POST] Error:", error);
+    console.error("[SIZES_POST] Error:", error);
     return new NextResponse("Internal Server Error", { status: 500 });
+  }
+}
+
+export async function GET(
+  req:Request,
+  {params}: {params: {storeId: string}}
+){
+  try{
+    if(!params.storeId){
+      return new NextResponse("Store id is required", {status: 400})
+    }
+    const sizes = await prismadb.size.findMany({
+      where:{
+        storeId:params.storeId,
+      },
+    });
+    return NextResponse.json(sizes)
+  }catch(error){
+    console.log('SIZES_GET', error);
+    return new NextResponse("Internal error", {status: 500})
   }
 }

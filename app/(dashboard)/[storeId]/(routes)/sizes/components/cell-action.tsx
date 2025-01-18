@@ -7,17 +7,16 @@ import {
   DropdownMenuLabel,
   DropdownMenuTrigger,
 } from "@/app/components/ui/dropdown-menu";
-
+import { SizeColumn  } from "./columns";
 import { Button } from "@/app/components/ui/button";
 import { Copy, Edit, MoreHorizontal, Trash } from "lucide-react";
 import toast from "react-hot-toast";
 import { useParams, useRouter } from "next/navigation";
 import { useState } from "react";
 import axios from "axios";
-import { CategoryColumn } from "./columns";
 
 interface CellActionProps {
-  data: CategoryColumn;
+  data: SizeColumn;
 }
 
 export const CellAction: React.FC<CellActionProps> = ({ data }) => {
@@ -29,19 +28,19 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
 
   const onCopy = (id: string) => {
     navigator.clipboard.writeText(id);
-    toast.success(" Category id Copied to the clipboard");
+    toast.success("Billboard id Copied to the clipboard");
   };
 
   const onDelete = async () => {
     try {
       setLoading(true);
       if (storeId) {
-        await axios.delete(`/api/${storeId}/categories/${data.id}`);
-        toast.success("Categories deleted successfully");
+        await axios.delete(`/api/${storeId}/sizes/${data.id}`);
+        toast.success("Billboard deleted successfully");
         router.refresh(); // Refresh the page to update the UI
       }
     } catch (error) {
-      toast.error("Error deleting categories");
+      toast.error("Error deleting billboard");
     } finally {
       setLoading(false);
     }
@@ -61,7 +60,7 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
           <Copy className="mr-2 h-4 w-4" />
           Copy Id
         </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => router.push(`/${storeId}/categories/${data.id}`)}>
+        <DropdownMenuItem onClick={() => router.push(`/${storeId}/sizes/${data.id}`)}>
           <Edit className="mr-2 h-4 w-4" />
           Update
         </DropdownMenuItem>

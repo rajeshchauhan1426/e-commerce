@@ -6,16 +6,16 @@ import { Separator } from "@/app/components/ui/separator";
 import { Billboard } from "@prisma/client";
 import { Plus } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
-import { CategoryColumn, columns } from "./columns";
+import { SizeColumn, columns } from "./columns";
 import { DataTable } from "@/app/components/ui/data-table";
 import { ApiList } from "@/app/components/ui/api-list";
 
 
-interface CategoryClientProps{
-  data: CategoryColumn[]
+interface SizesClientProps{
+  data: SizeColumn[]
 }
 
-export const  CategoryClient: React.FC<CategoryClientProps> = ({
+export const SizesClient: React.FC<SizesClientProps> = ({
   data
 }) => {
   const router = useRouter();
@@ -39,19 +39,19 @@ export const  CategoryClient: React.FC<CategoryClientProps> = ({
     <>
       <div className="flex items-center justify-between">
         <Heading
-          title={`Categories(${data.length})`}
-          description="Manage Categories for your store"
+          title={`Sizes (${data.length})`}
+          description="Manage Sizes for your store"
         />
-        <Button onClick={() => router.push(`/${storeId}/categories/new`)}>
+        <Button onClick={() => router.push(`/${storeId}/sizes/new`)}>
           <Plus className="mr-2 h-4 w-4" />
           Add New
         </Button>
       </div>
       <Separator />
       <DataTable  searchKey="name" columns={columns} data={data}/>
-      <Heading title="API" description="API calls for Categories" />
+      <Heading title="API" description="API calls for Sizes" />
       <Separator/>
-      <ApiList entityName="categories" entityIdName="categoryId" />
+      <ApiList entityName="sizes" entityIdName="SizeId" />
     </>
   );
 };
