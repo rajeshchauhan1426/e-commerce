@@ -1,7 +1,8 @@
-import { getServerSession } from "next-auth";
-import { NextResponse } from "next/server";
 import prismadb from "@/app/libs/prismadb";
 import { authOptions } from "@/pages/api/auth/[...nextauth]";
+import { getServerSession } from "next-auth";
+
+import { NextResponse } from "next/server";
 
 interface Params {
   storeId: string;
@@ -28,17 +29,21 @@ export async function POST(req: Request, context: { params: Params }) {
 
     // Step 3: Parse request body
     const body = await req.json();
-    const { label, imageUrl } = body;
+    const { name, billboardId } = body;
 
     // Step 4: Validate input fields
-    if (!label) {
-      return new NextResponse("Label is required", { status: 400 });
+    if (!name) {
+      return new NextResponse("Name is required", { status: 400 });
     }
-    if (!imageUrl || !Array.isArray(imageUrl) || imageUrl.length === 0) {
-      return new NextResponse("At least one image URL is required", { status: 400 });
+    if (!billboardId) {
+      return new NextResponse("Billboard is required", { status: 400 });
     }
 
     const { storeId } = context.params;
+
+    if (!storeId) {
+      return new NextResponse("Store ID is required", { status: 400 });
+    }
 
     // Step 5: Verify ownership of the store
     const storeByUserId = await prismadb.store.findFirst({
@@ -52,20 +57,19 @@ export async function POST(req: Request, context: { params: Params }) {
       return new NextResponse("Unauthorized", { status: 403 });
     }
 
-    // Step 6: Create the billboard
-    const billboard = await prismadb.billboard.create({
+    // Step 6: Create the category
+    const category = await prismadb.category.create({
       data: {
-        label,
-        imageUrl, // Store the array of image URLs
-        createdUrl: imageUrl[0], // Assign the first image as the `createdUrl`
+        name,
+        billboardId,
         storeId,
       },
     });
 
-    // Step 7: Return the created billboard
-    return NextResponse.json(billboard);
+    // Step 7: Return the created category
+    return NextResponse.json(category);
   } catch (error) {
-    console.error("[BILLBOARDS_POST] Error:", error);
+    console.error("[CATEGORIES_POST] Error:", error);
     return new NextResponse("Internal Server Error", { status: 500 });
   }
 }
