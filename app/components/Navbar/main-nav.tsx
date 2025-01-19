@@ -35,6 +35,11 @@ export function MainNav({
       active: pathname === `/${storeId}/sizes`, // Ensures case-insensitive comparison
     },
     {
+      href: `/${storeId}/colours`, // Adjusted to match dynamic structure
+      label: "Colours",
+      active: pathname === `/${storeId}/colours`, // Ensures case-insensitive comparison
+    },
+    {
       href: `/${storeId}/settings`, // Adjusted to match dynamic structure
       label: "Settings",
       active: pathname === `/${storeId}/settings`, // Ensures case-insensitive comparison
