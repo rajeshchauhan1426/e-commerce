@@ -6,16 +6,16 @@ import { Separator } from "@/app/components/ui/separator";
 import { Billboard } from "@prisma/client";
 import { Plus } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
-import {  ColourColumn, columns } from "./columns";
+import { SizeColumn, columns } from "./columns";
 import { DataTable } from "@/app/components/ui/data-table";
 import { ApiList } from "@/app/components/ui/api-list";
 
 
-interface ColoursClientProps{
-  data: ColourColumn[]
+interface SizesClientProps{
+  data: SizeColumn[]
 }
 
-export const ColoursClient: React.FC<ColoursClientProps> = ({
+export const SizesClient: React.FC<SizesClientProps> = ({
   data
 }) => {
   const router = useRouter();
@@ -39,19 +39,19 @@ export const ColoursClient: React.FC<ColoursClientProps> = ({
     <>
       <div className="flex items-center justify-between">
         <Heading
-          title={`Colours (${data.length})`}
-          description="Manage Colours for your store"
+          title={`Sizes (${data.length})`}
+          description="Manage Sizes for your store"
         />
-        <Button onClick={() => router.push(`/${storeId}/colours/new`)}>
+        <Button onClick={() => router.push(`/${storeId}/sizes/new`)}>
           <Plus className="mr-2 h-4 w-4" />
           Add New
         </Button>
       </div>
       <Separator />
-      <DataTable  searchKey="colour" columns={columns} data={data}/>
-      <Heading title="API" description="API calls for Colours" />
+      <DataTable  searchKey="name" columns={columns} data={data}/>
+      <Heading title="API" description="API calls for Sizes" />
       <Separator/>
-      <ApiList entityName="colours" entityIdName="colourId" />
+      <ApiList entityName="sizes" entityIdName="SizeId" />
     </>
   );
 };

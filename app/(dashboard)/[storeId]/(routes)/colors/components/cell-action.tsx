@@ -7,17 +7,16 @@ import {
   DropdownMenuLabel,
   DropdownMenuTrigger,
 } from "@/app/components/ui/dropdown-menu";
-
+import { SizeColumn  } from "./columns";
 import { Button } from "@/app/components/ui/button";
 import { Copy, Edit, MoreHorizontal, Trash } from "lucide-react";
 import toast from "react-hot-toast";
 import { useParams, useRouter } from "next/navigation";
 import { useState } from "react";
 import axios from "axios";
-import { ColourColumn } from "./columns";
 
 interface CellActionProps {
-  data: ColourColumn;
+  data: SizeColumn;
 }
 
 export const CellAction: React.FC<CellActionProps> = ({ data }) => {
@@ -36,7 +35,7 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
     try {
       setLoading(true);
       if (storeId) {
-        await axios.delete(`/api/${storeId}/colours/${data.id}`);
+        await axios.delete(`/api/${storeId}/sizes/${data.id}`);
         toast.success("Size deleted successfully");
         router.refresh(); // Refresh the page to update the UI
       }
@@ -61,7 +60,7 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
           <Copy className="mr-2 h-4 w-4" />
           Copy Id
         </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => router.push(`/${storeId}/colours/${data.id}`)}>
+        <DropdownMenuItem onClick={() => router.push(`/${storeId}/sizes/${data.id}`)}>
           <Edit className="mr-2 h-4 w-4" />
           Update
         </DropdownMenuItem>

@@ -3,7 +3,7 @@
 import { Button } from "@/app/components/ui/button";
 import { Heading } from "@/app/components/ui/heading";
 import { Separator } from "@/app/components/ui/separator";
-import { Colour, Size } from "@prisma/client";
+import { Size } from "@prisma/client";
 import { Trash } from "lucide-react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -26,7 +26,7 @@ import { useOrigin } from "@/app/components/hooks/use-origin";
 import { Modal } from "@/app/components/ui/modal"; // Add a Modal component to show confirmation.
 
 interface SizeFormProps {
-  initialData: Colour | null;
+  initialData: Size | null;
 }
 
 const formSchema = z.object({
@@ -36,7 +36,7 @@ const formSchema = z.object({
 
 type SizeFormValues = z.infer<typeof formSchema>;
 
-export const ColourForm: React.FC<SizeFormProps> = ({ initialData }) => {
+export const SizeForm: React.FC<SizeFormProps> = ({ initialData }) => {
   const router = useRouter();
   const { storeId, sizeId } = useParams<{ storeId: string; sizeId: string }>() || {};
   const [loading, setLoading] = useState(false);
