@@ -28,19 +28,19 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
 
   const onCopy = (id: string) => {
     navigator.clipboard.writeText(id);
-    toast.success("Colors id Copied to the clipboard");
+    toast.success("Color id Copied to the clipboard");
   };
 
   const onDelete = async () => {
     try {
       setLoading(true);
       if (storeId) {
-        await axios.delete(`/api/${storeId}/colors/${data.id}`);
+        await axios.delete(`/api/${storeId}/colours/${data.id}`);
         toast.success("Size deleted successfully");
         router.refresh(); // Refresh the page to update the UI
       }
     } catch (error) {
-      toast.error("Error deleting Colors");
+      toast.error("Error deleting billboard");
     } finally {
       setLoading(false);
     }
