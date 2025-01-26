@@ -35,7 +35,7 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
     try {
       setLoading(true);
       if (storeId) {
-        await axios.delete(`/api/${storeId}/colours/${data.id}`);
+        await axios.delete(`/api/${storeId}/colors/${data.id}`);
         toast.success("Size deleted successfully");
         router.refresh(); // Refresh the page to update the UI
       }
