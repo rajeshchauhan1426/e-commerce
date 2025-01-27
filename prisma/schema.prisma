@@ -123,3 +123,7 @@ model Color{
 
   @@index([storeId])
 }
+
+model Product{
+  id String @id @default(uuid())
+}
