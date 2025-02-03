@@ -3,7 +3,7 @@
 import { Button } from "@/app/components/ui/button";
 import { Heading } from "@/app/components/ui/heading";
 import { Separator } from "@/app/components/ui/separator";
-import { Billboard } from "@prisma/client";
+import { Billboard, Product } from "@prisma/client";
 import { Trash } from "lucide-react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -26,8 +26,8 @@ import { useOrigin } from "@/app/components/hooks/use-origin";
 import ImageUpload from "@/app/components/ui/image-upload";
 import { Modal } from "@/app/components/ui/modal"; // Add a Modal component to show confirmation.
 
-interface BillboardFormProps {
-  initialData: Billboard | null;
+interface ProductFormProps {
+  initialData: Product | null;
 }
 
 const formSchema = z.object({
@@ -35,16 +35,16 @@ const formSchema = z.object({
   imageUrl: z.array(z.string().url("Each image must be a valid URL")),
 });
 
-type BillboardFormValues = z.infer<typeof formSchema>;
+type ProductFormValues = z.infer<typeof formSchema>;
 
-export const BillboardForm: React.FC<BillboardFormProps> = ({ initialData }) => {
+export const BillboardForm: React.FC<ProductFormProps> = ({ initialData }) => {
   const router = useRouter();
   const { storeId, billboardId } = useParams<{ storeId: string; billboardId: string }>() || {};
   const [loading, setLoading] = useState(false);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const origin = useOrigin();
 
-  const form = useForm<BillboardFormValues>({
+  const form = useForm<ProductFormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       label: initialData?.label || "",
@@ -77,7 +77,7 @@ export const BillboardForm: React.FC<BillboardFormProps> = ({ initialData }) => 
     }
   };
 
-  const onSubmit = async (data: BillboardFormValues) => {
+  const onSubmit = async (data: ProductFormValues) => {
     try {
       setLoading(true);
       let response;
