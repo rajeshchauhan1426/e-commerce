@@ -1,6 +1,7 @@
 import React from 'react'
 import prismadb from "@/app/libs/prismadb"
-import { BillboardForm } from './components/product-form'
+import { ProductForm } from './components/product-form'
+
 
 
 
@@ -22,7 +23,7 @@ params
     <div className='flex-col'>
     <div className='flex-1 space-y-4 p-8 pt-6'>
 
-         <BillboardForm
+         <ProductForm
          initialData={product}
          />
         </div>

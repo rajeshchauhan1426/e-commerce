@@ -3,7 +3,7 @@
 import { Button } from "@/app/components/ui/button";
 import { Heading } from "@/app/components/ui/heading";
 import { Separator } from "@/app/components/ui/separator";
-import { Billboard, Product } from "@prisma/client";
+import { Billboard, Image, Product } from "@prisma/client";
 import { Trash } from "lucide-react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -27,17 +27,25 @@ import ImageUpload from "@/app/components/ui/image-upload";
 import { Modal } from "@/app/components/ui/modal"; // Add a Modal component to show confirmation.
 
 interface ProductFormProps {
-  initialData: Product | null;
+  initialData: Product & {
+    images: Image[]
+  } | null;
 }
 
 const formSchema = z.object({
-  label: z.string().min(1, "Billboard label is required"),
-  imageUrl: z.array(z.string().url("Each image must be a valid URL")),
+  name: z.string().min(1),
+  images: z.object({url: z.string() }).array(),
+  price: z.coerce.number().min(1),
+  categoryId: z.string().min(1),
+  colorId: z.string().min(1),
+  sizeId: z.string().min(1),
+  isFeatured: z.boolean().default(false).optional(),
+  isArchived: z.boolean().default(false).optional(),
 });
 
 type ProductFormValues = z.infer<typeof formSchema>;
 
-export const BillboardForm: React.FC<ProductFormProps> = ({ initialData }) => {
+export const ProductForm: React.FC<ProductFormProps> = ({ initialData }) => {
   const router = useRouter();
   const { storeId, billboardId } = useParams<{ storeId: string; billboardId: string }>() || {};
   const [loading, setLoading] = useState(false);
@@ -46,9 +54,18 @@ export const BillboardForm: React.FC<ProductFormProps> = ({ initialData }) => {
 
   const form = useForm<ProductFormValues>({
     resolver: zodResolver(formSchema),
-    defaultValues: {
-      label: initialData?.label || "",
-      imageUrl: initialData?.imageUrl || [],
+    defaultValues: initialData  ? {
+     ...initialData,
+     price:parseFloat(String(initialData?.price))
+    } : {
+      name:  "",
+      images:[],
+      price: 0,
+      categoryId: '',
+      colorId: '',
+      sizeId: '',
+      isFeatured: false,
+      isArchived: false
     },
   });
 
@@ -124,13 +141,13 @@ export const BillboardForm: React.FC<ProductFormProps> = ({ initialData }) => {
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8 w-full">
           <FormField
             control={form.control}
-            name="imageUrl"
+            name="images"
             render={({ field }) => (
               <FormItem>
                 <FormLabel className="text-sm">Background image</FormLabel>
                 <FormControl>
                   <ImageUpload
-                    value={field.value}
+                    name={field.name}
                     disabled={loading}
                     onChange={(url) => field.onChange([...field.value, url])}
                     onRemove={(url) =>
@@ -145,7 +162,7 @@ export const BillboardForm: React.FC<ProductFormProps> = ({ initialData }) => {
           <div className="grid grid-cols-1 gap-8">
             <FormField
               control={form.control}
-              name="label"
+              name="name"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel className="text-sm">Billboard Label</FormLabel>
