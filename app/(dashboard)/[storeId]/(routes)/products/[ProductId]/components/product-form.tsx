@@ -278,25 +278,25 @@ export const ProductForm: React.FC<ProductFormProps> = ({ initialData }) => {
         },
   });
 
-  const title = initialData ? "Edit Billboard" : "Create Billboard";
+  const title = initialData ? "Edit Product" : "Create Product";
   const description = initialData
-    ? "Edit the details of your billboard"
-    : "Add a new billboard";
+    ? "Edit the details of your Product"
+    : "Add a new Product";
   const toastMessage = initialData
-    ? "Billboard updated successfully"
-    : "Billboard created successfully";
-  const actionLabel = initialData ? "Save Changes" : "Create Billboard";
+    ? "Product updated successfully"
+    : "Product created successfully";
+  const actionLabel = initialData ? "Save Changes" : "Create Product";
 
   const onDelete = async () => {
     try {
       setLoading(true);
       if (storeId && billboardId) {
         await axios.delete(`/api/${storeId}/billboards/${billboardId}`);
-        toast.success("Billboard deleted successfully");
+        toast.success("Product deleted successfully");
         router.push(`/${storeId}/billboards`);
       }
     } catch (error) {
-      toast.error("Error deleting billboard");
+      toast.error("Error deleting Product");
     } finally {
       setLoading(false);
       setDeleteModalOpen(false);
