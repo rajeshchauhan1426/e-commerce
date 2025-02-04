@@ -144,7 +144,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({ initialData }) => {
             name="images"
             render={({ field }) => (
               <FormItem>
-                <FormLabel className="text-sm">images</FormLabel>
+                <FormLabel className="text-sm">Images</FormLabel>
                 <FormControl>
                   <ImageUpload
                     value ={field.value.map((image) => image.url)}
