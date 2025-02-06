@@ -34,7 +34,7 @@ interface ProductFormProps {
 
 const formSchema = z.object({
   name: z.string().min(1),
-  images: z.object({url: z.string() }).array(),
+  images: z.object({ url: z.string() }).array(),
   price: z.coerce.number().min(1),
   categoryId: z.string().min(1),
   colorId: z.string().min(1),
@@ -54,19 +54,21 @@ export const ProductForm: React.FC<ProductFormProps> = ({ initialData }) => {
 
   const form = useForm<ProductFormValues>({
     resolver: zodResolver(formSchema),
-    defaultValues: initialData  ? {
-     ...initialData,
-     price:parseFloat(String(initialData?.price))
-    } : {
-      name:  "",
-      images:[],
-      price: 0,
-      categoryId: '',
-      colorId: '',
-      sizeId: '',
-      isFeatured: false,
-      isArchived: false
-    },
+    defaultValues: initialData
+      ? {
+          ...initialData,
+          price: parseFloat(String(initialData?.price)),
+        }
+      : {
+          name: "",
+          images: [],
+          price: 0,
+          categoryId: "",
+          colorId: "",
+          sizeId: "",
+          isFeatured: false,
+          isArchived: false,
+        },
   });
 
   const title = initialData ? "Edit Billboard" : "Create Product";
@@ -132,13 +134,13 @@ export const ProductForm: React.FC<ProductFormProps> = ({ initialData }) => {
             disabled={loading}
           >
             <Trash className="h-4 w-4 " />
-            
           </Button>
         )}
       </div>
       <Separator />
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8 w-full">
+          {/* Image Upload Field - Fixed */}
           <FormField
             control={form.control}
             name="images"
@@ -147,16 +149,20 @@ export const ProductForm: React.FC<ProductFormProps> = ({ initialData }) => {
                 <FormLabel className="text-sm">Images</FormLabel>
                 <FormControl>
                   <ImageUpload
-                    value ={field.value.map((image) => image.url)}
+                    value={field.value?.map((image) => image.url) || []}
                     disabled={loading}
-                    onChange={(url) => field.onChange([...field.value, {url}])}
-                    onRemove={(url) => field.onChange([...field.value.filter((current) => current.url !==url)])}
+                    onChange={(url) => field.onChange([...(field.value || []), { url }])}
+                    onRemove={(url) =>
+                      field.onChange(field.value?.filter((current) => current.url !== url) || [])
+                    }
                   />
                 </FormControl>
                 <FormMessage />
               </FormItem>
             )}
           />
+          
+          {/* Name Field */}
           <div className="space-y-8 w-60">
             <FormField
               control={form.control}
@@ -176,28 +182,30 @@ export const ProductForm: React.FC<ProductFormProps> = ({ initialData }) => {
               )}
             />
           </div>
+
+          {/* Submit Button */}
           <Button disabled={loading} className="ml-auto" type="submit">
             {actionLabel}
           </Button>
         </form>
       </Form>
-      
-      <Modal
-  isOpen={deleteModalOpen}
-  setIsOpen={() => setDeleteModalOpen(false)} // Use the correct onClose prop
-  title="Confirm Deletion"
-  description="Are you sure you want to delete this billboard? This action cannot be undone."
->
-  <div className="flex justify-end gap-4">
-    <Button variant="outline" onClick={() => setDeleteModalOpen(false)}>
-      Cancel
-    </Button>
-    <Button variant="destructive" onClick={onDelete} disabled={loading}>
-      Delete
-    </Button>
-  </div>
-</Modal>
 
+      {/* Delete Confirmation Modal */}
+      <Modal
+        isOpen={deleteModalOpen}
+        setIsOpen={() => setDeleteModalOpen(false)}
+        title="Confirm Deletion"
+        description="Are you sure you want to delete this billboard? This action cannot be undone."
+      >
+        <div className="flex justify-end gap-4">
+          <Button variant="outline" onClick={() => setDeleteModalOpen(false)}>
+            Cancel
+          </Button>
+          <Button variant="destructive" onClick={onDelete} disabled={loading}>
+            Delete
+          </Button>
+        </div>
+      </Modal>
     </>
   );
 };
