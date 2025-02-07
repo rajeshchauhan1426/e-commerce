@@ -27,7 +27,8 @@ import { useOrigin } from "@/app/components/hooks/use-origin";
 import ImageUpload from "@/app/components/ui/image-upload";
 import { Modal } from "@/app/components/ui/modal"; // Add a Modal component to show confirmation.
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/app/components/ui/select";
-import { Checkbox } from "@/app/components/ui/checkbox";
+import { Checkbox } from "@/components/ui/checkbox";
+
 
 interface ProductFormProps {
   initialData: Product & {
@@ -300,7 +301,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({ initialData, categorie
             control={form.control}
             name="isFeatured"
             render={({ field }) => (
-              <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md p-4 border-neutral-50">
+              <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md p-4 border border-gray-300">
               
                 <FormControl>
                   <Checkbox
@@ -322,7 +323,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({ initialData, categorie
             control={form.control}
             name="isArchived"
             render={({ field }) => (
-              <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md p-4">
+              <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md p-4 border border-gray-300">
               
                 <FormControl>
                   <Checkbox

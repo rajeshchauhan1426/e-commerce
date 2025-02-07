@@ -17,9 +17,7 @@ export async function POST(req: Request, context: { params: Params }) {
 
     // Step 2: Retrieve the authenticated user
     const user = await prismadb.user.findUnique({
-      where: {
-        email: session.user.email,
-      },
+      where: { email: session.user.email },
     });
 
     if (!user || !user.id) {
@@ -28,14 +26,16 @@ export async function POST(req: Request, context: { params: Params }) {
 
     // Step 3: Parse request body
     const body = await req.json();
-    const { label, imageUrl } = body;
+    const { name, price, categoryId, colorId, sizeId, images, isFeatured, isArchived } = body;
 
     // Step 4: Validate input fields
-    if (!label) {
-      return new NextResponse("Label is required", { status: 400 });
-    }
-    if (!imageUrl || !Array.isArray(imageUrl) || imageUrl.length === 0) {
-      return new NextResponse("At least one image URL is required", { status: 400 });
+    if (!name) return new NextResponse("Product name is required", { status: 400 });
+    if (!price) return new NextResponse("Price is required", { status: 400 });
+    if (!categoryId) return new NextResponse("Category ID is required", { status: 400 });
+    if (!colorId) return new NextResponse("Color ID is required", { status: 400 });
+    if (!sizeId) return new NextResponse("Size ID is required", { status: 400 });
+    if (!images || !Array.isArray(images) || images.length === 0) {
+      return new NextResponse("At least one image is required", { status: 400 });
     }
 
     const { storeId } = context.params;
@@ -52,20 +52,29 @@ export async function POST(req: Request, context: { params: Params }) {
       return new NextResponse("Unauthorized", { status: 403 });
     }
 
-    // Step 6: Create the billboard
-    const billboard = await prismadb.billboard.create({
+    // Step 6: Create the product
+    const product = await prismadb.product.create({
       data: {
-        label,
-        imageUrl, // Store the array of image URLs
-        createdUrl: imageUrl[0], // Assign the first image as the `createdUrl`
+        name,
+        price,
+        categoryId,
+        colorId,
+        sizeId,
+        isFeatured,
+        isArchived,
         storeId,
+        images: {
+          createMany: {
+            data: images.map((image: { url: string }) => ({ url: image.url })),
+          },
+        },
       },
     });
 
-    // Step 7: Return the created billboard
-    return NextResponse.json(billboard);
+    // Step 7: Return the created product
+    return NextResponse.json(product);
   } catch (error) {
-    console.error("[BILLBOARDS_POST] Error:", error);
+    console.error("[PRODUCTS_POST] Error:", error);
     return new NextResponse("Internal Server Error", { status: 500 });
   }
 }
