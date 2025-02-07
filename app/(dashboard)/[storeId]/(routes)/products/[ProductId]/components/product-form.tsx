@@ -54,7 +54,7 @@ type ProductFormValues = z.infer<typeof formSchema>;
 
 export const ProductForm: React.FC<ProductFormProps> = ({ initialData, categories, colors,sizes }) => {
   const router = useRouter();
-  const { storeId, billboardId } = useParams<{ storeId: string; billboardId: string }>() || {};
+  const { storeId, billboardId, productId } = useParams<{ storeId: string; billboardId: string; productId: string}>() || {};
   const [loading, setLoading] = useState(false);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const origin = useOrigin();
@@ -78,23 +78,23 @@ export const ProductForm: React.FC<ProductFormProps> = ({ initialData, categorie
 
   const title = initialData ? "Edit Product" : "Create Product";
   const description = initialData
-    ? "Edit the details of your billboard"
-    : "Add a new billboard";
+    ? "Edit the details of your Product"
+    : "Add a new Product";
   const toastMessage = initialData
-    ? "Billboard updated successfully"
-    : "Billboard created successfully";
+    ? "Product updated successfully"
+    : "Product created successfully";
   const actionLabel = initialData ? "Save Changes" : "Create Product";
 
   const onDelete = async () => {
     try {
       setLoading(true);
-      if (storeId && billboardId) {
-        await axios.delete(`/api/${storeId}/billboards/${billboardId}`);
-        toast.success("Billboard deleted successfully");
-        router.push(`/${storeId}/billboards`); // Redirect after deletion.
+      if (storeId && billboardId && productId) {
+        await axios.delete(`/api/${storeId}/products/${productId}`);
+        toast.success("Product deleted successfully");
+        router.push(`/${storeId}/products`); // Redirect after deletion.
       }
     } catch (error) {
-      toast.error("Error deleting billboard");
+      toast.error("Error deleting products");
     } finally {
       setLoading(false);
       setDeleteModalOpen(false);
@@ -106,23 +106,23 @@ export const ProductForm: React.FC<ProductFormProps> = ({ initialData, categorie
       setLoading(true);
       let response;
       if (initialData) {
-        if (storeId && billboardId) {
-          response = await axios.patch(`/api/${storeId}/billboards/${billboardId}`, data);
+        if (storeId && billboardId && productId ) {
+          response = await axios.patch(`/api/${storeId}/products/${productId}`, data);
         }
       } else {
         if (storeId) {
-          response = await axios.post(`/api/${storeId}/billboards`, data);
+          response = await axios.post(`/api/${storeId}/products`, data);
         }
       }
       toast.success(toastMessage);
 
       if (!initialData && response?.data?.id) {
-        router.push(`/${storeId}/billboards`);
+        router.push(`/${storeId}/products`);
       } else {
         router.refresh();
       }
     } catch (error) {
-      toast.error("Error saving billboard");
+      toast.error("Error saving product");
     } finally {
       setLoading(false);
     }
