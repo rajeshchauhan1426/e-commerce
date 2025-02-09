@@ -1,6 +1,5 @@
-import React from 'react';
-import prismadb from "@/app/libs/prismadb";
 import { ProductClient } from "./components/client";
+import prismadb from "@/app/libs/prismadb";
 import { ProductColumn } from "./components/columns";
 import { format } from "date-fns";
 import { formatter } from "@/lib/utils";
@@ -30,9 +29,13 @@ const ProductsPage = async ({
     name: item.name,
     isFeatured: item.isFeatured,
     isArchived: item.isArchived,
-    price: typeof item.price === 'string' ? parseFloat(item.price).toFixed(2) : item.price.toNumber().toFixed(2),
+
+    price: formatter.format({
+      value: item.price.toNumber(),  
+      currency: 'USD, INR',   
+    }),
     category: item.category.name,
-    size: item.size.name,
+    size: item.size.name,  // Corrected to size.name
     color: item.color.value,
     createdAt: format(item.createdAt, "MMM do, yyyy"),
   }));
