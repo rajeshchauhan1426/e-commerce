@@ -91,18 +91,17 @@ export const BillboardForm: React.FC<BillboardFormProps> = ({ initialData }) => 
         }
       }
       toast.success(toastMessage);
-
-      if (!initialData && response?.data?.id) {
-        router.push(`/${storeId}/billboards`);
-      } else {
-        router.refresh();
-      }
+  
+      // Navigate to billboard list after successful update
+      router.push(`/${storeId}/billboards`);
+      router.refresh();
     } catch (error) {
       toast.error("Error saving billboard");
     } finally {
       setLoading(false);
     }
   };
+  
 
   return (
     <>
