@@ -12,17 +12,26 @@ interface FormatCurrencyOptions {
 }
 
 export const formatter = {
-  format: ({ value, currency, locale }: FormatCurrencyOptions): string => {
+  format: (input: number | FormatCurrencyOptions): string => {
+    if (typeof input === "number") {
+      // If only a number is passed, default to USD and en-US
+      return new Intl.NumberFormat("en-US", {
+        style: "currency",
+        currency: "USD",
+      }).format(input);
+    }
+
+    const { value, currency, locale } = input;
     try {
       return new Intl.NumberFormat(locale || getDefaultLocale(), {
         style: "currency",
         currency: currency.toUpperCase(),
       }).format(value);
     } catch (error) {
-      // Fallback for invalid currencies or unsupported locales
       return `${currency.toUpperCase()} ${value.toFixed(2)}`;
     }
   },
+
   formatMultiple: (value: number) => {
     return {
       USD: formatter.format({ value, currency: "USD", locale: "en-US" }),
@@ -32,19 +41,11 @@ export const formatter = {
       EUR: formatter.format({ value, currency: "EUR", locale: "de-DE" }),
       GBP: formatter.format({ value, currency: "GBP", locale: "en-GB" }),
       AUD: formatter.format({ value, currency: "AUD", locale: "en-AU" }),
-      CAD: formatter.format({ value, currency: "CAD", locale: "en-CA" })
+      CAD: formatter.format({ value, currency: "CAD", locale: "en-CA" }),
     };
   },
 };
-
-function getDefaultLocale(): string {
-  if (typeof navigator !== "undefined") {
-    return navigator.language || "en-US";
-  }
-  return "en-US"; // Default for server-side or unsupported environments
+function getDefaultLocale(): string | string[] | undefined {
+  throw new Error("Function not implemented.");
 }
 
-// Example usage:
-// formatter.format({ value: 1234.56, currency: 'EUR' }) // uses browser locale
-// formatter.format({ value: 1234.56, currency: 'JPY', locale: 'ja-JP' })
-// formatter.formatMultiple(1234.56) // Returns multiple currency formats
