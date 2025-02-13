@@ -7,7 +7,7 @@ import {
   DropdownMenuLabel,
   DropdownMenuTrigger,
 } from "@/app/components/ui/dropdown-menu";
-import {  ProductColumn } from "./columns";
+import { ProductColumn } from "./columns";
 import { Button } from "@/app/components/ui/button";
 import { Copy, Edit, MoreHorizontal, Trash } from "lucide-react";
 import toast from "react-hot-toast";
@@ -22,25 +22,32 @@ interface CellActionProps {
 export const CellAction: React.FC<CellActionProps> = ({ data }) => {
   const router = useRouter();
   const params = useParams();
-  const storeId = params?.storeId;
+  const storeId = typeof params?.storeId === "string" ? params.storeId : undefined;
 
   const [loading, setLoading] = useState(false);
 
-  const onCopy = (id: string) => {
-    navigator.clipboard.writeText(id);
-    toast.success("Product id Copied to the clipboard");
+  const onCopy = async (id: string) => {
+    try {
+      await navigator.clipboard.writeText(id);
+      toast.success("Product ID copied to clipboard");
+    } catch (error) {
+      toast.error("Failed to copy Product ID");
+    }
   };
 
   const onDelete = async () => {
+    if (!storeId) {
+      toast.error("Invalid store ID");
+      return;
+    }
+
     try {
       setLoading(true);
-      if (storeId) {
-        await axios.delete(`/api/${storeId}/products/${data.id}`);
-        toast.success("Product deleted successfully");
-        router.refresh(); // Refresh the page to update the UI
-      }
+      await axios.delete(`/api/${storeId}/products/${data.id}`);
+      toast.success("Product deleted successfully");
+      router.refresh(); // Refresh the page to update the UI
     } catch (error) {
-      toast.error("Error deleting PRoduct");
+      toast.error("Error deleting product");
     } finally {
       setLoading(false);
     }
@@ -58,15 +65,18 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
         <DropdownMenuLabel>Action</DropdownMenuLabel>
         <DropdownMenuItem onClick={() => onCopy(data.id)}>
           <Copy className="mr-2 h-4 w-4" />
-          Copy Id
+          Copy ID
         </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => router.push(`/${storeId}/products/${data.id}`)}>
+        <DropdownMenuItem 
+          onClick={() => storeId && router.push(`/${storeId}/products/${data.id}`)}
+          disabled={!storeId}
+        >
           <Edit className="mr-2 h-4 w-4" />
           Update
         </DropdownMenuItem>
-        <DropdownMenuItem onClick={onDelete}>
+        <DropdownMenuItem onClick={onDelete} disabled={loading}>
           <Trash className="mr-2 h-4 w-4" />
-          Delete
+          {loading ? "Deleting..." : "Delete"}
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

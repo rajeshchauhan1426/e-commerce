@@ -53,10 +53,10 @@ const formSchema = z.object({
 });
 
 type ProductFormValues = z.infer<typeof formSchema>;
-
 export const ProductForm: React.FC<ProductFormProps> = ({ initialData, categories, colors,sizes }) => {
   const router = useRouter();
-  const { storeId, billboardId, productId } = useParams<{ storeId: string; billboardId: string; productId: string}>() || {};
+  
+  const { storeId, productId } = useParams<{ storeId: string; productId: string}>() || {};
   const [loading, setLoading] = useState(false);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const origin = useOrigin();
@@ -105,7 +105,8 @@ export const ProductForm: React.FC<ProductFormProps> = ({ initialData, categorie
       setDeleteModalOpen(false);
     }
   };
- const onSubmit = async (data: ProductFormValues) => {
+
+  const onSubmit = async (data: ProductFormValues) => {
     if (!storeId) {
       toast.error("Missing store ID");
       return;
@@ -119,7 +120,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({ initialData, categorie
         images: data.images.map((img) => ({ url: img.url })),
       };
 
-      if (initialData && productId) {
+      if (productId) {
         // Update existing product
         await axios.patch(`/api/${storeId}/products/${productId}`, productData);
       } else {
