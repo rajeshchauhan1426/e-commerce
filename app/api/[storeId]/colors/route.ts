@@ -26,11 +26,11 @@ export async function POST(req: Request, context: { params: Params }) {
 
     // Step 3: Parse request body
     const body = await req.json();
-    const { name, value } = body;
+    const { label, imageUrl } = body;
 
     // Step 4: Validate input fields
-    if (!name || !value) {
-      return new NextResponse("Name and Value are required", { status: 400 });
+    if (!label || !imageUrl) {
+      return new NextResponse("Label and Image URL are required", { status: 400 });
     }
 
     const { storeId } = context.params;
@@ -54,8 +54,8 @@ export async function POST(req: Request, context: { params: Params }) {
     // Step 6: Create the color entry
     const color = await prismadb.color.create({
       data: {
-        name,
-        value,
+        name: label,
+        value: imageUrl, // Assuming this should be the color value
         storeId,
       },
     });
@@ -63,11 +63,10 @@ export async function POST(req: Request, context: { params: Params }) {
     // Step 7: Return the created color entry
     return NextResponse.json(color);
   } catch (error) {
-    console.error("[COLORS_POST] Error:", error);
+    console.error("[BILLBOARDS_POST] Error:", error);
     return new NextResponse("Internal Server Error", { status: 500 });
   }
 }
-
 
 export async function GET(
   req: Request,
@@ -89,7 +88,7 @@ export async function GET(
     // Return the colors
     return NextResponse.json(colors);
   } catch (error) {
-    console.error("[COLORS_GET] Error:", error);
+    console.error("[BILLBOARDS_GET] Error:", error);
     return new NextResponse("Internal Server Error", { status: 500 });
   }
 }
