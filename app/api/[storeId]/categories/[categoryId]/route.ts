@@ -143,34 +143,6 @@ export async function GET(
       return new NextResponse("Category ID is required", { status: 400 });
     }
 
-    // Retrieve the user session
-    const session = await getServerSession(authOptions);
-
-    if (!session || !session.user?.email) {
-      return new NextResponse("Unauthenticated", { status: 401 });
-    }
-
-    // Find the user from the database using the email in the session
-    const user = await prismadb.user.findUnique({
-      where: { email: session.user.email },
-    });
-
-    if (!user) {
-      return new NextResponse("User not found", { status: 404 });
-    }
-
-    // Check if the store belongs to the user
-    const storeByUserId = await prismadb.store.findFirst({
-      where: {
-        id: params.storeId,
-        userId: user.id,
-      },
-    });
-
-    if (!storeByUserId) {
-      return new NextResponse("Unauthorized", { status: 403 });
-    }
-
     // Retrieve the category based on the categoryId and storeId
     const category = await prismadb.category.findUnique({
       where: { id: params.categoryId },
@@ -188,3 +160,4 @@ export async function GET(
     return new NextResponse("Internal error", { status: 500 });
   }
 }
+

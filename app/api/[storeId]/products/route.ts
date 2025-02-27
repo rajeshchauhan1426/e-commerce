@@ -78,3 +78,61 @@ export async function POST(req: Request, context: { params: Params }) {
     return new NextResponse("Internal Server Error", { status: 500 });
   }
 }
+
+export async function GET(
+  req: Request,
+  { params }: { params: { storeId: string; productId: string } }
+) {
+  try {
+    const { searchParams } = new URL(req.url);
+    const categoryId = searchParams.get("categoryId") || undefined;
+    const colorId = searchParams.get("colorId") || undefined;
+    const sizeId = searchParams.get("sizeId") || undefined;
+    const isFeatured = searchParams.get("isFeatured") === "true";
+
+    // Validate storeId and productId
+    if (!params.storeId) {
+      return new NextResponse("Store ID is required", { status: 400 });
+    }
+
+    if (!params.productId) {
+      return new NextResponse("Product ID is required", { status: 400 });
+    }
+
+    // Retrieve the product
+    const product = await prismadb.product.findUnique({
+      where: {
+        id: params.productId,
+        storeId: params.storeId,
+        categoryId,
+        colorId,
+        sizeId,
+        isFeatured: isFeatured ? true : undefined,
+        isArchived: false,
+      },
+      include: {
+        images: true,
+        category: true,
+        color: true,
+        size: true,
+      },
+    });
+
+    if (!product) {
+      return new NextResponse("Product not found", { status: 404 });
+    }
+
+    // Convert Decimal and Date fields
+    const formattedProduct = {
+      ...product,
+      price: product.price.toNumber(), // Convert Decimal to number
+      createdAt: product.createdAt.toISOString(), // Convert Date to string
+      updatedAt: product.updatedAt.toISOString(), // Convert Date to string
+    };
+
+    return NextResponse.json(formattedProduct);
+  } catch (error) {
+    console.error("[PRODUCT_GET]", error);
+    return new NextResponse("Internal error", { status: 500 });
+  }
+}

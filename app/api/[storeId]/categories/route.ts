@@ -73,3 +73,37 @@ export async function POST(req: Request, context: { params: Params }) {
     return new NextResponse("Internal Server Error", { status: 500 });
   }
 }
+
+
+// GET Route: Fetch a specific category
+export async function GET(
+  req: Request,
+  { params }: { params: { storeId: string; categoryId: string } }
+) {
+  try {
+    // Validate if storeId and categoryId are provided in the URL parameters
+    if (!params.storeId) {
+      return new NextResponse("Store ID is required", { status: 400 });
+    }
+
+    if (!params.categoryId) {
+      return new NextResponse("Category ID is required", { status: 400 });
+    }
+
+    // Retrieve the category based on the categoryId and storeId
+    const category = await prismadb.category.findUnique({
+      where: { id: params.categoryId },
+    });
+
+    // Ensure the category exists and belongs to the provided storeId
+    if (!category || category.storeId !== params.storeId) {
+      return new NextResponse("Category not found", { status: 404 });
+    }
+
+    // Return the found category
+    return NextResponse.json(category);
+  } catch (error) {
+    console.error("[CATEGORY_GET]", error);
+    return new NextResponse("Internal error", { status: 500 });
+  }
+}

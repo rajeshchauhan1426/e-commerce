@@ -69,3 +69,26 @@ export async function POST(req: Request, context: { params: Params }) {
     return new NextResponse("Internal Server Error", { status: 500 });
   }
 }
+
+
+
+export async function GET(
+  req: Request,
+  { params }: { params: { storeId: string } }
+) {
+  try {
+    if (!params.storeId) {
+      return new NextResponse("Store ID is required", { status: 400 });
+    }
+
+    // Fetch billboards associated with the store
+    const billboards = await prismadb.billboard.findMany({
+      where: { storeId: params.storeId },
+    });
+
+    return NextResponse.json(billboards);
+  } catch (error) {
+    console.error("[BILLBOARDS_GET]", error);
+    return new NextResponse("Internal error", { status: 500 });
+  }
+}
