@@ -11,33 +11,34 @@ export async function POST(req: Request, context: { params: Params }) {
   try {
     // Step 1: Validate user session
     const session = await getServerSession(authOptions);
-    if (!session?.user?.email) {
+    if (!session || !session.user || !session.user.email) {
       return new NextResponse("Unauthorized", { status: 401 });
     }
 
     // Step 2: Retrieve the authenticated user
     const user = await prismadb.user.findUnique({
-      where: { email: session.user.email },
+      where: {
+        email: session.user.email,
+      },
     });
 
-    if (!user) {
+    if (!user || !user.id) {
       return new NextResponse("Unauthenticated: User not found", { status: 401 });
     }
 
     // Step 3: Parse request body
     const body = await req.json();
-    const { label, imageUrl } = body;
+    const { name, value } = body;
 
     // Step 4: Validate input fields
-    if (!label || !imageUrl) {
-      return new NextResponse("Label and Image URL are required", { status: 400 });
+    if (!name) {
+      return new NextResponse("Name is required", { status: 400 });
+    }
+    if (!value) {
+      return new NextResponse("Color value is required", { status: 400 });
     }
 
     const { storeId } = context.params;
-
-    if (!storeId) {
-      return new NextResponse("Store ID is required", { status: 400 });
-    }
 
     // Step 5: Verify ownership of the store
     const storeByUserId = await prismadb.store.findFirst({
@@ -51,19 +52,19 @@ export async function POST(req: Request, context: { params: Params }) {
       return new NextResponse("Unauthorized", { status: 403 });
     }
 
-    // Step 6: Create the color entry
+    // Step 6: Create the color
     const color = await prismadb.color.create({
       data: {
-        name: label,
-        value: imageUrl, // Assuming this should be the color value
+        name,
+        value,
         storeId,
       },
     });
 
-    // Step 7: Return the created color entry
+    // Step 7: Return the created color
     return NextResponse.json(color);
   } catch (error) {
-    console.error("[BILLBOARDS_POST] Error:", error);
+    console.error("[COLORS_POST] Error:", error);
     return new NextResponse("Internal Server Error", { status: 500 });
   }
 }
@@ -75,7 +76,6 @@ export async function GET(
   try {
     const { storeId } = params;
 
-    // Validate the storeId
     if (!storeId) {
       return new NextResponse("Store ID is required", { status: 400 });
     }
@@ -88,7 +88,7 @@ export async function GET(
     // Return the colors
     return NextResponse.json(colors);
   } catch (error) {
-    console.error("[BILLBOARDS_GET] Error:", error);
+    console.error("[COLORS_GET] Error:", error);
     return new NextResponse("Internal Server Error", { status: 500 });
   }
 }
