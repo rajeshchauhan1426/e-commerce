@@ -7,28 +7,23 @@ interface Params {
   storeId: string;
 }
 
-export async function POST(req: Request, context: { params: Params }) {
+
+interface Params {
+  storeId: string;
+}
+
+export async function POST(req: Request, { params }: { params: Params }) {
   try {
-    // Step 1: Validate user session
     const session = await getServerSession(authOptions);
-    if (!session || !session.user || !session.user.email) {
+
+    // Validate session
+    if (!session?.user?.email) {
       return new NextResponse("Unauthorized", { status: 401 });
     }
 
-    // Step 2: Retrieve the authenticated user
-    const user = await prismadb.user.findUnique({
-      where: { email: session.user.email },
-    });
+    const { name, price, categoryId, colorId, sizeId, images, isFeatured, isArchived } = await req.json(); // Destructure in one step
 
-    if (!user || !user.id) {
-      return new NextResponse("Unauthenticated: User not found", { status: 401 });
-    }
-
-    // Step 3: Parse request body
-    const body = await req.json();
-    const { name, price, categoryId, colorId, sizeId, images, isFeatured, isArchived } = body;
-
-    // Step 4: Validate input fields
+    // Validate input
     if (!name) return new NextResponse("Product name is required", { status: 400 });
     if (!price) return new NextResponse("Price is required", { status: 400 });
     if (!categoryId) return new NextResponse("Category ID is required", { status: 400 });
@@ -38,9 +33,17 @@ export async function POST(req: Request, context: { params: Params }) {
       return new NextResponse("At least one image is required", { status: 400 });
     }
 
-    const { storeId } = context.params;
+    const { storeId } = params;
 
-    // Step 5: Verify ownership of the store
+    // Verify store ownership
+    const user = await prismadb.user.findUnique({
+      where: { email: session.user.email }, // Use session email directly
+    });
+
+    if (!user) {
+      return new NextResponse("User not found", { status: 404 }); // More specific error
+    }
+
     const storeByUserId = await prismadb.store.findFirst({
       where: {
         id: storeId,
@@ -49,10 +52,10 @@ export async function POST(req: Request, context: { params: Params }) {
     });
 
     if (!storeByUserId) {
-      return new NextResponse("Unauthorized", { status: 403 });
+      return new NextResponse("Unauthorized", { status: 403 }); // Ownership error
     }
 
-    // Step 6: Create the product
+    // Create the product
     const product = await prismadb.product.create({
       data: {
         name,
@@ -65,13 +68,12 @@ export async function POST(req: Request, context: { params: Params }) {
         storeId,
         images: {
           createMany: {
-            data: images.map((image: { url: string }) => ({ url: image.url })),
+            data: images.map((image: { url: string }) => ({ url: image.url })), // Streamlined mapping
           },
         },
       },
     });
 
-    // Step 7: Return the created product
     return NextResponse.json(product);
   } catch (error) {
     console.error("[PRODUCTS_POST] Error:", error);
