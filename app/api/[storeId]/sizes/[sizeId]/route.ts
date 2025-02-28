@@ -112,3 +112,33 @@ export async function DELETE(
   }
 }
 
+export async function GET(
+  req: Request,
+  { params }: { params: { storeId: string; sizeId: string } }
+) {
+  try {
+    if (!params.storeId) {
+      return new NextResponse("Store ID is required", { status: 400 });
+    }
+
+    if (!params.sizeId) {
+      return new NextResponse("Size ID is required", { status: 400 });
+    }
+
+    // Retrieve the size based on the sizeId and storeId
+    const size = await prismadb.size.findUnique({
+      where: { id: params.sizeId },
+    });
+
+    // Ensure the size exists and belongs to the provided storeId
+    if (!size || size.storeId !== params.storeId) {
+      return new NextResponse("Size not found", { status: 404 });
+    }
+
+    return NextResponse.json(size);
+  } catch (error) {
+    console.error("[SIZE_GET]", error);
+    return new NextResponse("Internal error", { status: 500 });
+  }
+}
+
