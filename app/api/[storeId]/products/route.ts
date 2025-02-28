@@ -85,9 +85,10 @@ export async function GET(
 ) {
   try {
     const { searchParams } = new URL(req.url);
-    const categoryId = searchParams.get("categoryId") || undefined;
-    const colorId = searchParams.get("colorId") || undefined;
-    const sizeId = searchParams.get("sizeId") || undefined;
+
+    const categoryId = searchParams.get("categoryId") ?? undefined;
+    const colorId = searchParams.get("colorId") ?? undefined;
+    const sizeId = searchParams.get("sizeId") ?? undefined;
     const isFeatured = searchParams.get("isFeatured");
 
     if (!params.storeId) {
@@ -100,10 +101,10 @@ export async function GET(
     const products = await prismadb.product.findMany({
       where: {
         storeId: params.storeId,
-        categoryId,
-        colorId,
-        sizeId,
-        isFeatured: isFeatured ? true : undefined,
+        categoryId: categoryId as string | undefined, // Type assertion
+        colorId: colorId as string | undefined,     // Type assertion
+        sizeId: sizeId as string | undefined,       // Type assertion
+        isFeatured: isFeatured === 'true' ? true : (isFeatured === 'false' ? false : undefined),
         isArchived: false,
       },
       include: {
