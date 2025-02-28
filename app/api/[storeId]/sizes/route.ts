@@ -78,8 +78,12 @@ export async function GET(
       return new NextResponse("Store ID is required", { status: 400 });
     }
 
+    // Fetch sizes associated with the store
     const sizes = await prismadb.size.findMany({
       where: { storeId: params.storeId },
+      orderBy: {
+        createdAt: 'desc'
+      }
     });
 
     return NextResponse.json(sizes);

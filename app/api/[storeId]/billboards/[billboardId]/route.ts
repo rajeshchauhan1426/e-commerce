@@ -112,3 +112,35 @@ export async function DELETE(
   }
 }
 
+// GET Route: Fetch a specific billboard
+export async function GET(
+  req: Request,
+  { params }: { params: { storeId: string; billboardId: string } }
+) {
+  try {
+    if (!params.storeId) {
+      return new NextResponse("Store ID is required", { status: 400 });
+    }
+
+    if (!params.billboardId) {
+      return new NextResponse("Billboard ID is required", { status: 400 });
+    }
+
+    // Retrieve the billboard based on the billboardId and storeId
+    const billboard = await prismadb.billboard.findUnique({
+      where: { id: params.billboardId },
+    });
+
+    // Ensure the billboard exists and belongs to the provided storeId
+    if (!billboard || billboard.storeId !== params.storeId) {
+      return new NextResponse("Billboard not found", { status: 404 });
+    }
+
+    return NextResponse.json(billboard);
+  } catch (error) {
+    console.error("[BILLBOARD_GET]", error);
+    return new NextResponse("Internal error", { status: 500 });
+  }
+}
+
+

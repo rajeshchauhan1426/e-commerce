@@ -70,8 +70,6 @@ export async function POST(req: Request, context: { params: Params }) {
   }
 }
 
-
-
 export async function GET(
   req: Request,
   { params }: { params: { storeId: string } }
@@ -84,6 +82,9 @@ export async function GET(
     // Fetch billboards associated with the store
     const billboards = await prismadb.billboard.findMany({
       where: { storeId: params.storeId },
+      orderBy: {
+        createdAt: 'desc'
+      }
     });
 
     return NextResponse.json(billboards);
