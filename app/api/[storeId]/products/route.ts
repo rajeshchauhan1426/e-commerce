@@ -81,28 +81,24 @@ export async function POST(req: Request, context: { params: Params }) {
 
 export async function GET(
   req: Request,
-  { params }: { params: { storeId: string; productId: string } }
+  { params }: { params: { storeId: string } }
 ) {
   try {
     const { searchParams } = new URL(req.url);
     const categoryId = searchParams.get("categoryId") || undefined;
     const colorId = searchParams.get("colorId") || undefined;
     const sizeId = searchParams.get("sizeId") || undefined;
-    const isFeatured = searchParams.get("isFeatured") === "true";
+    const isFeatured = searchParams.get("isFeatured");
 
-    // Validate storeId and productId
     if (!params.storeId) {
       return new NextResponse("Store ID is required", { status: 400 });
     }
 
-    if (!params.productId) {
-      return new NextResponse("Product ID is required", { status: 400 });
-    }
+    console.log('Searching for products with storeId:', params.storeId); // Debug log
 
-    // Retrieve the product
-    const product = await prismadb.product.findUnique({
+    // Fetch products associated with the store
+    const products = await prismadb.product.findMany({
       where: {
-        id: params.productId,
         storeId: params.storeId,
         categoryId,
         colorId,
@@ -116,23 +112,16 @@ export async function GET(
         color: true,
         size: true,
       },
+      orderBy: {
+        createdAt: 'desc'
+      }
     });
 
-    if (!product) {
-      return new NextResponse("Product not found", { status: 404 });
-    }
+    console.log('Found products:', products.length); // Debug log
 
-    // Convert Decimal and Date fields
-    const formattedProduct = {
-      ...product,
-      price: product.price.toNumber(), // Convert Decimal to number
-      createdAt: product.createdAt.toISOString(), // Convert Date to string
-      updatedAt: product.updatedAt.toISOString(), // Convert Date to string
-    };
-
-    return NextResponse.json(formattedProduct);
+    return NextResponse.json(products);
   } catch (error) {
-    console.error("[PRODUCT_GET]", error);
+    console.error("[PRODUCTS_GET]", error);
     return new NextResponse("Internal error", { status: 500 });
   }
 }
