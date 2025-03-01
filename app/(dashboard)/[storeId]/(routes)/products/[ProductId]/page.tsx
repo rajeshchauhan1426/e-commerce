@@ -32,6 +32,7 @@ const ProductPage = async ({
       storeId: params.storeId,
     }
   })
+  
 
   return (
     <div className='flex-col'>
