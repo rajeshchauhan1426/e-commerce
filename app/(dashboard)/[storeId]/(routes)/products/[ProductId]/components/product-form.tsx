@@ -263,7 +263,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({ initialData, categorie
                       ))}
                     </SelectContent>
                   </Select>
-                  <FormMessage />
+                   <FormMessage />
                 </FormItem>
               )}
             />
