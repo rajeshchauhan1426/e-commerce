@@ -128,36 +128,50 @@ export async function DELETE(
   }
 }
 
-// GET Route: Fetch a specific category
+
+
+// GET Route: Fetch a specific category or all categories for a store
 export async function GET(
   req: Request,
-  { params }: { params: { storeId: string; categoryId: string } }
+  { params }: { params: { storeId: string; categoryId?: string } }
 ) {
   try {
-    // Validate if storeId and categoryId are provided in the URL parameters
-    if (!params.storeId) {
+    const { storeId, categoryId } = params;
+
+    if (!storeId) {
       return new NextResponse("Store ID is required", { status: 400 });
     }
 
-    if (!params.categoryId) {
-      return new NextResponse("Category ID is required", { status: 400 });
+    // If categoryId is provided, fetch a single category
+    if (categoryId) {
+      const category = await prismadb.category.findUnique({
+        where: { id: categoryId },
+        include: {
+          billboard: true,
+        },
+      });
+
+      if (!category || category.storeId !== storeId) {
+        return new NextResponse("Category not found", { status: 404 });
+      }
+
+      return NextResponse.json(category);
     }
 
-    // Retrieve the category based on the categoryId and storeId
-    const category = await prismadb.category.findUnique({
-      where: { id: params.categoryId },
+    // If categoryId is not provided, return all categories for the store
+    const categories = await prismadb.category.findMany({
+      where: { storeId },
+      include: {
+        billboard: true,
+      },
+      orderBy: {
+        createdAt: 'desc',
+      },
     });
 
-    // Ensure the category exists and belongs to the provided storeId
-    if (!category || category.storeId !== params.storeId) {
-      return new NextResponse("Category not found", { status: 404 });
-    }
-
-    // Return the found category
-    return NextResponse.json(category);
+    return NextResponse.json(categories);
   } catch (error) {
     console.error("[CATEGORY_GET]", error);
     return new NextResponse("Internal error", { status: 500 });
   }
 }
-
